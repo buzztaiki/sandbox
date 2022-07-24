@@ -1,0 +1,10 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: readiness-probe
+spec:
+  template:
+    spec:
+      containers:
+      - name: app
+        args: ["--no-recover"]

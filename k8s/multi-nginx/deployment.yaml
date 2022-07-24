@@ -1,0 +1,49 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+spec:
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      containers:
+      - name: nginx1
+        image: nginx:1.23.1
+        volumeMounts:
+          - mountPath: /etc/nginx/templates
+            name: nginx-templates
+        env:
+          - name: NGINX_PORT
+            value: "80"
+        ports:
+          - name: nginx1
+            containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /status
+            port: nginx1
+      - name: nginx2
+        image: nginx:1.23.1
+        volumeMounts:
+          - mountPath: /etc/nginx/templates
+            name: nginx-templates
+        env:
+          - name: NGINX_PORT
+            value: "81"
+        ports:
+          - name: nginx2
+            containerPort: 81
+        readinessProbe:
+          httpGet:
+            path: /status
+            port: nginx2
+      volumes:
+        - name: nginx-templates
+          configMap:
+            name: nginx-tmeplate

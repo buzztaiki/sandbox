@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: readiness-probe
+spec:
+  selector:
+  replicas: 2
+  template:
+    metadata:
+    spec:
+      containers:
+      - name: app
+        image: local/k8s-sandbox/readiness-probe:dev
+        readinessProbe:
+          exec:
+            command:
+            - cat
+            - /tmp/healthy
+          initialDelaySeconds: 3
+          periodSeconds: 3
