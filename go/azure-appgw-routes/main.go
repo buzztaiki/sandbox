@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/network/armnetwork"
@@ -68,28 +69,31 @@ func subResourceID(res *armnetwork.SubResource) string {
 }
 
 type Rule struct {
-	Name        string
-	Type        string
-	Listener    Listener
-	BackendAddr []string
-	Routes      []Route
+	Name            string
+	Type            string
+	Listener        Listener
+	BackendAddr     []string
+	BackendSettings *BackendSettings
+	Routes          []Route
 }
 type Route struct {
-	Name        string
-	Paths       []string
-	BackendAddr []string
-	RedirectURL string
+	Name            string
+	Paths           []string
+	BackendAddr     []string
+	BackendSettings *BackendSettings
+	RedirectURL     string
 }
 
 func rules(appgw *armnetwork.ApplicationGateway) []Rule {
 	rules := []Rule{}
 	for _, rr := range appgw.Properties.RequestRoutingRules {
 		rules = append(rules, Rule{
-			Name:        *rr.Name,
-			Type:        string(*rr.Properties.RuleType),
-			Listener:    listener(appgw, subResourceID(rr.Properties.HTTPListener)),
-			BackendAddr: backendPoolAddrs(appgw, subResourceID(rr.Properties.BackendAddressPool)),
-			Routes:      routes(appgw, subResourceID(rr.Properties.URLPathMap)),
+			Name:            *rr.Name,
+			Type:            string(*rr.Properties.RuleType),
+			Listener:        listener(appgw, subResourceID(rr.Properties.HTTPListener)),
+			BackendAddr:     backendPoolAddrs(appgw, subResourceID(rr.Properties.BackendAddressPool)),
+			BackendSettings: backendSettings(appgw, subResourceID(rr.Properties.BackendHTTPSettings)),
+			Routes:          routes(appgw, subResourceID(rr.Properties.URLPathMap)),
 		})
 	}
 	return rules
@@ -110,10 +114,11 @@ func routes(appgw *armnetwork.ApplicationGateway, id string) []Route {
 			routes = append(
 				routes,
 				Route{
-					Name:        *pathRule.Name,
-					Paths:       paths,
-					BackendAddr: backendPoolAddrs(appgw, subResourceID(pathRule.Properties.BackendAddressPool)),
-					RedirectURL: redirectURL(appgw, subResourceID(pathRule.Properties.RedirectConfiguration)),
+					Name:            *pathRule.Name,
+					Paths:           paths,
+					BackendAddr:     backendPoolAddrs(appgw, subResourceID(pathRule.Properties.BackendAddressPool)),
+					BackendSettings: backendSettings(appgw, subResourceID(pathRule.Properties.BackendHTTPSettings)),
+					RedirectURL:     redirectURL(appgw, subResourceID(pathRule.Properties.RedirectConfiguration)),
 				})
 		}
 		return routes
@@ -139,12 +144,61 @@ func backendPoolAddrs(appgw *armnetwork.ApplicationGateway, id string) []string 
 	return nil
 }
 
+type BackendSettings struct {
+	Probe Probe
+}
+
+func backendSettings(appgw *armnetwork.ApplicationGateway, id string) *BackendSettings {
+	for _, bs := range appgw.Properties.BackendHTTPSettingsCollection {
+		if *bs.ID != id {
+			continue
+		}
+
+		return &BackendSettings{
+			Probe: probe(appgw, subResourceID(bs.Properties.Probe)),
+		}
+
+	}
+	return nil
+}
+
+type Probe struct {
+	Name string
+	Host string
+	Port int32
+	Path string
+}
+
+func probe(appgw *armnetwork.ApplicationGateway, id string) Probe {
+	for _, pb := range appgw.Properties.Probes {
+		if *pb.ID != id {
+			continue
+		}
+
+		port := int32(-1)
+		if pb.Properties.Port != nil {
+			port = *pb.Properties.Port
+		}
+		return Probe{
+			Name: *pb.Name,
+			Host: *pb.Properties.Host,
+			Port: port,
+			Path: *pb.Properties.Path,
+		}
+	}
+	return Probe{}
+}
+
 func redirectURL(appgw *armnetwork.ApplicationGateway, id string) string {
 	for _, rc := range appgw.Properties.RedirectConfigurations {
 		if *rc.ID != id {
 			continue
 		}
-		return *rc.Properties.TargetURL
+		url := ""
+		if rc.Properties.TargetURL != nil {
+			url = *rc.Properties.TargetURL
+		}
+		return url
 	}
 	return ""
 }
@@ -161,8 +215,19 @@ func listener(appgw *armnetwork.ApplicationGateway, id string) Listener {
 			continue
 		}
 
+		host := ""
+		if ln.Properties.HostName != nil {
+			host = *ln.Properties.HostName
+		} else if ln.Properties.HostNames != nil {
+			xs := []string{}
+			for _, x := range ln.Properties.HostNames {
+				xs = append(xs, *x)
+			}
+			host = strings.Join(xs, ",")
+		}
+
 		return Listener{
-			Host:     *ln.Properties.HostName,
+			Host:     host,
 			Protocol: string(*ln.Properties.Protocol),
 			Port:     port(appgw, subResourceID(ln.Properties.FrontendPort)),
 		}
