@@ -145,7 +145,10 @@ func backendPoolAddrs(appgw *armnetwork.ApplicationGateway, id string) []string 
 }
 
 type BackendSettings struct {
-	Probe Probe
+	Name     string
+	Port     int32
+	Protocol string
+	Probe    Probe
 }
 
 func backendSettings(appgw *armnetwork.ApplicationGateway, id string) *BackendSettings {
@@ -155,7 +158,10 @@ func backendSettings(appgw *armnetwork.ApplicationGateway, id string) *BackendSe
 		}
 
 		return &BackendSettings{
-			Probe: probe(appgw, subResourceID(bs.Properties.Probe)),
+			Name:     *bs.Name,
+			Port:     *bs.Properties.Port,
+			Protocol: string(*bs.Properties.Protocol),
+			Probe:    probe(appgw, subResourceID(bs.Properties.Probe)),
 		}
 
 	}
