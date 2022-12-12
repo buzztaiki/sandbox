@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "azmlv1-dataset-operation"
+version = "0.1.0"
+description = ""
+authors = ["Taiki Sugawara <buzz.taiki@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+azureml-core = "^1.38.0"
+azure-identity = "^1.7.0"
+azureml-dataset-runtime = {version = "^1.43.0", platform = "linux"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
