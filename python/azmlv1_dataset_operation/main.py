@@ -2,9 +2,8 @@ import argparse
 from dataclasses import dataclass
 from enum import Enum
 
-from azure.identity import DefaultAzureCredential
-from azureml.core import Dataset, Workspace
-from azureml.core.authentication import TokenAuthentication
+from azureml.core import Dataset, Datastore, Workspace
+from azureml.core.authentication import AzureCliAuthentication
 
 
 class Action(Enum):
@@ -52,26 +51,30 @@ def parse_args() -> Args:
 
 def main():
     args = parse_args()
-    credential = DefaultAzureCredential()
+
+    auth = AzureCliAuthentication()
     mlws = Workspace(
         subscription_id=args.subscription,
         resource_group=args.resource_group,
         workspace_name=args.workspace,
-        auth=TokenAuthentication(lambda audience: credential.get_token(audience).token),
+        auth=auth
     )
 
     with open(args.lst_file) as f:
         for line in f:
             dataset_name = line.rstrip()
             if args.action == Action.ADD:
+                datastore = Datastore.get(mlws, args.datastore)
                 dataset = Dataset.File.from_files(
-                    path=(args.datastore, dataset_name),
+                    path=(datastore, dataset_name),
+                    # path=[(args.datastore, dataset_name)],
                     validate=False,
                 )
                 dataset.register(
                     workspace=mlws,
                     name=dataset_name,
                     description=f"Automatically registered from {args.datastore}/{dataset_name}",
+                    create_new_version=True
                 )
             elif args.action == Action.DELETE:
                 dataset = Dataset.get_by_name(
@@ -82,3 +85,7 @@ def main():
                     dataset.unregister_all_versions()
             else:
                 assert False
+
+
+if __name__ == "__main__":
+    main()
