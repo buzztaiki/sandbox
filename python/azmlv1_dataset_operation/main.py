@@ -85,7 +85,7 @@ def main():
                     if dataset is not None:
                         dataset.unregister_all_versions()
                 except UserErrorException as e:
-                    print(f"failed to add {dataset_name} to {mlws}: {e}")
+                    print(f"failed to delete {dataset_name} to {mlws}: {e}")
             else:
                 assert False
 
