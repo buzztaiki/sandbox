@@ -6,7 +6,7 @@ authors = ["Taiki Sugawara <buzz.taiki@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-azureml-core = "^1.38.0"
+azureml-core = "^1.43.0"
 azureml-dataset-runtime = {version = "^1.43.0", platform = "linux"}
 azure-cli-core = "^2.31.0"
 
