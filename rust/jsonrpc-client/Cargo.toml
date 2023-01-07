@@ -8,5 +8,5 @@ edition = "2018"
 [dependencies]
 jsonrpc-core = "18.0.0"
 jsonrpc-client-transports = "18.0.0"
-tokio = "1.11.0"
+tokio = "1.16.1"
 serde_json = "1.0.67"
