@@ -1,0 +1,7 @@
+services:
+  python:
+    build:
+      dockerfile: ./Dockerfile
+    volumes:
+      - .:/app
+    working_dir: /app
