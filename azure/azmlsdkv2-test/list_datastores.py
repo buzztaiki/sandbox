@@ -15,14 +15,13 @@ class Args:
 
 
 def parse_args():
-    subscription = json.loads(
-        subprocess.run(
-            ["az", "account", "show"], capture_output=True, check=True
-        ).stdout
-    )["id"]
+    subscription = json.loads(subprocess.run(["az", "account", "show"], capture_output=True, check=True).stdout)["id"]
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-s", "--subscription", help="subscription", default=subscription
+        "-s",
+        "--subscription",
+        help=f"subscription (default {subscription})",
+        default=subscription,
     )
     parser.add_argument("-g", "--resource-group", help="resource group", required=True)
     parser.add_argument("-w", "--workspace", help="ml workspace", required=True)
@@ -34,10 +33,9 @@ def parse_args():
         workspace=args.workspace,
     )
 
+
 args = parse_args()
 
-ml_client = MLClient(
-    DefaultAzureCredential(), args.subscription, args.resource_group, args.workspace
-)
+ml_client = MLClient(DefaultAzureCredential(), args.subscription, args.resource_group, args.workspace)
 for x in ml_client.datastores.list():
     print(x.name, x.type)
