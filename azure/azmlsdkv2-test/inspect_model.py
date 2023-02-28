@@ -12,6 +12,8 @@ class Args:
     subscription: str
     resource_group: str
     workspace: str
+    model: str
+    version: str
 
 
 def parse_args():
@@ -25,17 +27,22 @@ def parse_args():
     )
     parser.add_argument("-g", "--resource-group", help="resource group", required=True)
     parser.add_argument("-w", "--workspace", help="ml workspace", required=True)
+    parser.add_argument("model", help="model to inspect")
+    parser.add_argument("version", help="model version")
 
     args = parser.parse_args()
     return Args(
         subscription=args.subscription,
         resource_group=args.resource_group,
         workspace=args.workspace,
+        model=args.model,
+        version=args.version,
     )
 
 
 args = parse_args()
 
 ml_client = MLClient(DefaultAzureCredential(), args.subscription, args.resource_group, args.workspace)
-for x in ml_client.datastores.list():
-    print(x.name, x.type)
+model = ml_client.models.get(args.model, version=args.version)
+model.print_as_yaml = True
+print(model)
