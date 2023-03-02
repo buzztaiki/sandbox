@@ -40,9 +40,14 @@ def parse_args():
     )
 
 
-args = parse_args()
+def main():
+    args = parse_args()
 
-ml_client = MLClient(DefaultAzureCredential(), args.subscription, args.resource_group, args.workspace)
-data = ml_client.data.get(args.data, version=args.version)
-data.print_as_yaml = True
-print(data)
+    ml_client = MLClient(DefaultAzureCredential(), args.subscription, args.resource_group, args.workspace)
+    data = ml_client.data.get(args.data, version=args.version)
+    data.print_as_yaml = True
+    print(data)
+
+
+if __name__ == "__main__":
+    main()

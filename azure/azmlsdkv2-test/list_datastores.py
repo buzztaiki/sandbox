@@ -34,8 +34,13 @@ def parse_args():
     )
 
 
-args = parse_args()
+def main():
+    args = parse_args()
 
-ml_client = MLClient(DefaultAzureCredential(), args.subscription, args.resource_group, args.workspace)
-for x in ml_client.datastores.list():
-    print(x.name, x.type)
+    ml_client = MLClient(DefaultAzureCredential(), args.subscription, args.resource_group, args.workspace)
+    for x in ml_client.datastores.list():
+        print(x.name, x.type)
+
+
+if __name__ == "__main__":
+    main()
