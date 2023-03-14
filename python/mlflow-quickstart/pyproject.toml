@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "mlflow-quickstart"
+version = "0.1.0"
+description = ""
+authors = ["Taiki Sugawara <buzz.taiki@gmail.com>"]
+readme = "README.md"
+packages = [{include = "mlflow_quickstart"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+mlflow-skinny = "^2.2.2"
+mlflow = "^2.2.2"
+# belows are workaroud for installation problem
+numba = "^0.56.0"
+databricks-cli = "0.17.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
