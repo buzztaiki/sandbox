@@ -1,6 +1,4 @@
 import argparse
-import json
-import subprocess
 from dataclasses import dataclass
 
 from azure.ai.ml import MLClient
@@ -9,32 +7,20 @@ from azure.identity import DefaultAzureCredential
 
 @dataclass
 class Args:
-    subscription: str
-    resource_group: str
-    workspace: str
+    config: str
     model: str
     version: str
 
 
 def parse_args():
-    subscription = json.loads(subprocess.run(["az", "account", "show"], capture_output=True, check=True).stdout)["id"]
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-s",
-        "--subscription",
-        help=f"subscription (default: {subscription})",
-        default=subscription,
-    )
-    parser.add_argument("-g", "--resource-group", help="resource group", required=True)
-    parser.add_argument("-w", "--workspace", help="ml workspace", required=True)
+    parser.add_argument("-c", "--config", help="path to config json", default="config.json")
     parser.add_argument("-v", "--version", help="model version (default: latest)", default="latest")
     parser.add_argument("model", help="model to inspect")
 
     args = parser.parse_args()
     return Args(
-        subscription=args.subscription,
-        resource_group=args.resource_group,
-        workspace=args.workspace,
+        config=args.config,
         model=args.model,
         version=args.version,
     )
@@ -42,7 +28,7 @@ def parse_args():
 
 def main():
     args = parse_args()
-    ml_client = MLClient.from_config(DefaultAzureCredential())
+    ml_client = MLClient.from_config(DefaultAzureCredential(), file_name=args.config)
 
     if args.version == "latest":
         model = ml_client.models.get(args.model, label="latest")
