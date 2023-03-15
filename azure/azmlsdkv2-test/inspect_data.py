@@ -27,8 +27,8 @@ def parse_args():
     )
     parser.add_argument("-g", "--resource-group", help="resource group", required=True)
     parser.add_argument("-w", "--workspace", help="ml workspace", required=True)
+    parser.add_argument("-v", "--version", help="model version (default: latest)", default="latest")
     parser.add_argument("data", help="data to inspect")
-    parser.add_argument("version", help="data version")
 
     args = parser.parse_args()
     return Args(
@@ -44,7 +44,10 @@ def main():
     args = parse_args()
 
     ml_client = MLClient(DefaultAzureCredential(), args.subscription, args.resource_group, args.workspace)
-    data = ml_client.data.get(args.data, version=args.version)
+    if args.version == "latest":
+        data = ml_client.data.get(args.data, label="latest")
+    else:
+        data = ml_client.data.get(args.data, version=args.version)
     data.print_as_yaml = True
     print(data)
 
