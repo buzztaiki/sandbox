@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "azmlsdkv1-test"
+version = "0.1.0"
+description = ""
+authors = ["Taiki Sugawara <buzz.taiki@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+azureml-core = "^1.49.0"
+azure-cli-core = "^2.45.0"
+azureml-dataset-runtime = "^1.49.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 120
