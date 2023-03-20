@@ -40,4 +40,5 @@ def main():
         print(ds.name, ds.id)
 
 
-main()
+if __name__ == '__main__':
+    main()
