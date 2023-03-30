@@ -34,10 +34,19 @@ def main():
     pprint.pp(details)
     print()
 
+    print("TAGS")
+    pprint.pp(run.tags)
+    print()
+
     print("INPUT_DATASETS:")
     for x in details["inputDatasets"]:
         ds: Dataset = x["dataset"]
         print(ds.name, ds.id)
+    print()
+
+    print("FILES")
+    pprint.pp(run.get_file_names())
+    print()
 
 
 if __name__ == '__main__':
