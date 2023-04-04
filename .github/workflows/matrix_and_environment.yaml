@@ -1,5 +1,8 @@
 name: Matrix and Environment
 
+# matrix と environment を組み合わせたと時にどう見えるかのテスト
+# 結果は https://github.com/buzztaiki/sandbox/pull/15
+
 on:
   pull_request:
 
