@@ -1,0 +1,26 @@
+name: Matrix and Environment
+
+# matrix と environment を組み合わせたと時にどう見えるかのテスト
+# 結果は https://github.com/buzztaiki/sandbox/pull/15
+
+on:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: matrix_and_environment
+
+    strategy:
+      matrix:
+        node-version: ['14.x', '16.x']
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Node version
+      run: node --version
