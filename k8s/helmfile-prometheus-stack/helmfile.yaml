@@ -1,0 +1,18 @@
+---
+repositories:
+  - name: prometheus-community
+    url: https://prometheus-community.github.io/helm-charts
+
+releases:
+  - name: prometheus-stack
+    chart: prometheus-community/kube-prometheus-stack
+    namespace: prometheus
+    values:
+      - grafana:
+          adminPassword: "asdfjkl;"
+          sidecar:
+            dashboards:
+              provider:
+                folder: Kube-Prometheus
+                disableDelete: true
+                allowUiUpdates: false
