@@ -1,0 +1,27 @@
+---
+environments:
+  kind1:
+    kubeContext: kind-kind1
+    values:
+      - address: 172.18.255.0/24
+  kind2:
+    kubeContext: kind-kind2
+    values:
+      - address: 172.18.254.0/24
+
+---
+repositories:
+  - name: metallb
+    url: https://metallb.github.io/metallb
+
+releases:
+  - name: metallb
+    chart: metallb/metallb
+    namespace: metallb-system
+  - name: metallb-config
+    chart: ./metallb-config
+    namespace: metallb-system
+    needs: [metallb]
+    values:
+      - ipAddressPool:
+          address: {{ .Values.address }}
