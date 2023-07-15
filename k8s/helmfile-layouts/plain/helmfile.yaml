@@ -5,16 +5,18 @@ environments:
     values:
       - prometheus:
           enabled: true
+          loadBalancerIP: "172.18.255.200"
         grafana:
           enabled: true
+          loadBalancerIP: "172.18.255.201"
   kind2:
     kubeContext: kind-kind2
     values:
       - prometheus:
           enabled: true
+          loadBalancerIP: "172.18.254.200"
         grafana:
           enabled: false
-
 ---
 repositories:
   - name: prometheus-community
@@ -30,20 +32,24 @@ releases:
     values:
       - server:
           service:
-            servicePort: 9090
+            loadBalancerIP: "{{ .Values.prometheus.loadBalancerIP }}"
+            type: LoadBalancer
   - name: grafana
     chart: grafana/grafana
     namespace: grafana
     condition: grafana.enabled
     values:
       - service:
-          port: 3000
+          loadBalancerIP: "{{ .Values.grafana.loadBalancerIP }}"
+          type: LoadBalancer
         adminPassword: admin
         datasources:
           datasources.yaml:
             apiVersion: 1
             datasources:
-            - name: Prometheus | kind1
-              type: prometheus
-              url: http://prometheus-server.prometheus.svc:9090
-              isDefault: true
+              - name: Prometheus | kind1
+                type: prometheus
+                url: http://172.18.255.200
+              - name: Prometheus | kind2
+                type: prometheus
+                url: http://172.18.254.200
