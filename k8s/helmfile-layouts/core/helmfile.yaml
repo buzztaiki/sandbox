@@ -8,7 +8,6 @@ environments:
     kubeContext: kind-kind2
     values:
       - address: 172.18.254.0/24
-
 ---
 repositories:
   - name: metallb
@@ -22,6 +21,13 @@ releases:
     chart: ./metallb-config
     namespace: metallb-system
     needs: [metallb]
+    hooks:
+      - events: ["presync"]
+        command: sh
+        args:
+          - -c
+          - kubectl --context kind-{{ .Environment.Name }} -n metallb-system rollout status deployment metallb-controller
+        showlogs: true
     values:
       - ipAddressPool:
           address: {{ .Values.address }}

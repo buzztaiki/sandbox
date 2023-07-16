@@ -9,7 +9,5 @@ delete-clusters:
     kind delete cluster -n kind2
 
 prepare-clusters:
-    # metallb インストール直後だと準備ができてないぽくて metal-config のインストールでエラーがでる。2回目は成功するけど、status: failed になってる。
-    # その後 metal-config を uninstal → install だとうまくいく。
     helmfile apply -f core/helmfile.yaml -e kind1 --skip-diff-on-install
     helmfile apply -f core/helmfile.yaml -e kind2 --skip-diff-on-install
