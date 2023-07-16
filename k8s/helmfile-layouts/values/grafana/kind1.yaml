@@ -1,0 +1,14 @@
+service:
+  type: LoadBalancer
+  loadBalancerIP: 172.18.255.201
+adminPassword: "asdfjkl;"
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Prometheus | kind1
+        type: prometheus
+        url: http://172.18.255.200
+      - name: Prometheus | kind2
+        type: prometheus
+        url: http://172.18.254.200

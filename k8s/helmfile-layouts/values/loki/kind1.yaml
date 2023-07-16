@@ -1,0 +1,21 @@
+loki:
+  storage:
+    type: filesystem
+  memcached:
+    enabled: true
+  commonConfig:
+    # NOTE: avoid "at least 2 live replicas required, could only find 1" when use single replica
+    replication_factor: 1
+gateway:
+  service:
+    type: LoadBalancer
+    loadBalancerIP: 172.18.255.202
+singleBinary:
+  replicas: 1
+monitoring:
+  selfMonitoring:
+    # NOTE: required GrafanaAgent CRD
+    enabled: false
+test:
+  # NOTE: needs monitoring.selfMonitoring
+  enabled: false
