@@ -4,5 +4,6 @@ ip:
     grafana: 172.18.255.201
     loki: 172.18.255.202
     victoriaMetrics: 172.18.255.203
+    alertmanager: 172.18.255.204
   kind2:
     prometheus: 172.18.254.200

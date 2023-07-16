@@ -25,6 +25,12 @@ datasources:
           httpHeaderName1: X-Scope-OrgID
         secureJsonData:
           httpHeaderValue1: default
+      - name: AlertManager
+        type: alertmanager
+        url: http://{{ .StateValues.ip.kind1.alertmanager }}:9093
+        jsonData:
+          implementation: prometheus
+          handleGrafanaManagedAlerts: false
 sidecar:
   dashboards:
     enabled: true

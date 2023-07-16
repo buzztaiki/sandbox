@@ -3,10 +3,15 @@ prometheus:
     type: LoadBalancer
     loadBalancerIP: "{{ .StateValues.ip.kind1.prometheus }}"
   prometheusSpec:
+    externalUrl: "http://{{ .StateValues.ip.kind1.prometheus }}:9090"
     externalLabels:
       cluster: kind1
     remoteWrite:
       - url: http://{{ .StateValues.ip.kind1.victoriaMetrics }}:8428/api/v1/write
+    # NOTE: Default configuration will connect to the alertmanager deployed as part of this release
+    # alertingEndpoints: []
+
+
 
     # avoid to add release label for monitor selector
     ruleSelectorNilUsesHelmValues: false
@@ -26,4 +31,7 @@ grafana:
   defaultDashboardsTimezone: Asia/Tokyo
 
 alertmanager:
-  enabled: false
+  enabled: true
+  service:
+    type: LoadBalancer
+    loadBalancerIP: "{{ .StateValues.ip.kind1.alertmanager }}"
