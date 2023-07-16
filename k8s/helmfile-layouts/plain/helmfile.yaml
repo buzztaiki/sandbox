@@ -3,20 +3,29 @@ environments:
   kind1:
     kubeContext: kind-kind1
     values:
-      - prometheus:
+      - environment-values.yaml
+      - cluster: kind1
+        prometheus:
           enabled: true
           loadBalancerIP: "172.18.255.200"
         grafana:
           enabled: true
           loadBalancerIP: "172.18.255.201"
+        loki:
+          enabled: true
+          loadBalancerIP: "172.18.255.202"
+        promtail:
+          enabled: true
   kind2:
     kubeContext: kind-kind2
     values:
-      - prometheus:
+      - environment-values.yaml
+      - cluster: kind2
+        prometheus:
           enabled: true
           loadBalancerIP: "172.18.254.200"
-        grafana:
-          enabled: false
+        promtail:
+          enabled: true
 ---
 repositories:
   - name: prometheus-community
@@ -32,17 +41,20 @@ releases:
     values:
       - server:
           service:
-            loadBalancerIP: "{{ .Values.prometheus.loadBalancerIP }}"
             type: LoadBalancer
+            loadBalancerIP: "{{ .Values.prometheus.loadBalancerIP }}"
+          global:
+            external_labels:
+              cluster: "{{ .Values.cluster }}"
   - name: grafana
     chart: grafana/grafana
     namespace: grafana
     condition: grafana.enabled
     values:
       - service:
-          loadBalancerIP: "{{ .Values.grafana.loadBalancerIP }}"
           type: LoadBalancer
-        adminPassword: admin
+          loadBalancerIP: "{{ .Values.grafana.loadBalancerIP }}"
+        adminPassword: "asdfjkl;"
         datasources:
           datasources.yaml:
             apiVersion: 1
@@ -53,3 +65,40 @@ releases:
               - name: Prometheus | kind2
                 type: prometheus
                 url: http://172.18.254.200
+  - name: loki
+    chart: grafana/loki
+    namespace: loki
+    condition: loki.enabled
+    values:
+      - loki:
+          storage:
+            type: filesystem
+          memcached:
+            enabled: true
+          commonConfig:
+            # NOTE: avoid "at least 2 live replicas required, could only find 1" when use single replica
+            replication_factor: 1
+        gateway:
+          service:
+            type: LoadBalancer
+            loadBalancerIP: "{{ .Values.loki.loadBalancerIP }}"
+        singleBinary:
+          replicas: 1
+        monitoring:
+          selfMonitoring:
+            # NOTE: required GrafanaAgent CRD
+            enabled: false
+        test:
+          # NOTE: needs monitoring.selfMonitoring
+          enabled: false
+  - name: promtail
+    chart: grafana/promtail
+    namespace: promtail
+    condition: promtail.enabled
+    values:
+      - config:
+          clients:
+            - url: http://172.18.255.202/loki/api/v1/push
+              tenant_id: default
+              external_labels:
+                cluster: "{{ .Values.cluster }}"
