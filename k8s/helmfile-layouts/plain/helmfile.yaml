@@ -41,6 +41,18 @@ releases:
     condition: prometheus.enabled
     values:
       - ../values/prometheus/{{ .Environment.Name }}.yaml.gotmpl
+    jsonPatches:
+      # hack grafana_folder annotation for dashboard ConfigMaps
+      - target:
+          version: v1
+          kind: ConfigMap
+          name: .*
+          labelSelector: grafana_dashboard=1
+        patch:
+          - op: add
+            path: /metadata/annotations/grafana_folder
+            value: Monitoring Mixin
+
   - name: grafana
     chart: grafana/grafana
     namespace: grafana
