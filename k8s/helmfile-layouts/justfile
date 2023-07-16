@@ -1,0 +1,7 @@
+create-clusters:
+    kind create cluster -n kind1
+    kind create cluster -n kind2
+
+delete-clusters:
+    kind delete cluster -n kind1
+    kind delete cluster -n kind2
