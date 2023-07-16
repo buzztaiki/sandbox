@@ -25,15 +25,14 @@ datasources:
           httpHeaderName1: X-Scope-OrgID
         secureJsonData:
           httpHeaderValue1: default
-plugins:
-  - https://github.com/VictoriaMetrics/grafana-datasource/releases/download/v0.2.0/victoriametrics-datasource-v0.2.0.zip;victoriametrics-datasource
 sidecar:
-  alerts:
-    enabled: true
-    searchNamespace: ALL
   dashboards:
     enabled: true
     searchNamespace: ALL
+    folderAnnotation: grafana-folder
+    provider:
+      disableDelete: true
+      foldersFromFilesStructure: true
 
 grafana.ini:
   users:
