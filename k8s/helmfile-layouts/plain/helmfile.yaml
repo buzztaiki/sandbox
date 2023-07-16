@@ -36,7 +36,7 @@ repositories:
 
 releases:
   - name: prometheus
-    chart: prometheus-community/prometheus
+    chart: prometheus-community/kube-prometheus-stack
     namespace: prometheus
     condition: prometheus.enabled
     values:

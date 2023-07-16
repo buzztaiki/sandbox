@@ -1,9 +1,29 @@
-server:
+prometheus:
   service:
     type: LoadBalancer
     loadBalancerIP: "{{ .StateValues.ip.kind1.prometheus }}"
-  remoteWrite:
-    - url: http://{{ .StateValues.ip.kind1.victoriaMetrics }}:8428/api/v1/write
-  global:
-    external_labels:
+  prometheusSpec:
+    externalLabels:
       cluster: kind1
+    remoteWrite:
+      - url: http://{{ .StateValues.ip.kind1.victoriaMetrics }}:8428/api/v1/write
+
+    # avoid to add release label for monitor selector
+    ruleSelectorNilUsesHelmValues: false
+    serviceMonitorSelectorNilUsesHelmValues: false
+    probeSelectorNilUsesHelmValues: false
+    scrapeConfigSelectorNilUsesHelmValues: false
+
+    # manage all monitor CRDs
+    ruleNamespaceSelector: {}
+    serviceMonitorSelector: {}
+    probeSelector: {}
+    scrapeConfigSelector: {}
+
+grafana:
+  enabled: false
+  forceDeployDashboards: true
+  defaultDashboardsTimezone: Asia/Tokyo
+
+alertmanager:
+  enabled: false
