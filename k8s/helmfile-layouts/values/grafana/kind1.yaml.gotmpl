@@ -12,3 +12,21 @@ datasources:
       - name: Prometheus | kind2
         type: prometheus
         url: http://{{ .StateValues.ip.kind2.prometheus }}
+      - name: Loki
+        type: loki
+        url: http://loki.loki.svc:3100
+        jsonData:
+          httpHeaderName1: X-Scope-OrgID
+        secureJsonData:
+          httpHeaderValue1: default
+      - name: VictoriaMetrics
+        type: victoriametrics-datasource
+        url: http://{{ .StateValues.ip.kind1.victoriaMetrics }}:8428
+plugins:
+  - https://github.com/VictoriaMetrics/grafana-datasource/releases/download/v0.2.0/victoriametrics-datasource-v0.2.0.zip;victoriametrics-datasource
+
+grafana.ini:
+  plugins:
+    allow_loading_unsigned_plugins: victoriametrics-datasource
+  users:
+    default_theme: light

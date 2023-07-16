@@ -1,0 +1,8 @@
+server:
+server:
+  service:
+    type: LoadBalancer
+    loadBalancerIP: "{{ .StateValues.ip.kind1.victoriaMetrics }}"
+    clusterIP: null
+  statefulSet:
+    enabled: false

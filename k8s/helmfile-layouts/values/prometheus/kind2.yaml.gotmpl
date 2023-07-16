@@ -2,6 +2,8 @@ server:
   service:
     type: LoadBalancer
     loadBalancerIP: "{{ .StateValues.ip.kind2.prometheus }}"
+  remoteWrite:
+    - url: http://{{ .StateValues.ip.kind1.victoriaMetrics }}:8428/api/v1/write
   global:
     external_labels:
       cluster: kind2

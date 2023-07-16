@@ -13,7 +13,7 @@ environments:
           enabled: true
         promtail:
           enabled: true
-        victoria-metrics:
+        victoriaMetrics:
           enabled: true
   kind2:
     kubeContext: kind-kind2
@@ -31,6 +31,8 @@ repositories:
     url: https://prometheus-community.github.io/helm-charts
   - name: grafana
     url: https://grafana.github.io/helm-charts
+  - name: victoria-metrics
+    url: https://victoriametrics.github.io/helm-charts/
 
 releases:
   - name: prometheus
@@ -57,3 +59,9 @@ releases:
     condition: promtail.enabled
     values:
       - ../values/promtail/{{ .Environment.Name }}.yaml.gotmpl
+  - name: victoria-metrics
+    chart: victoria-metrics/victoria-metrics-single
+    namespace: victoria-metrics
+    condition: victoriaMetrics.enabled
+    values:
+      - ../values/victoria-metrics/{{ .Environment.Name }}.yaml.gotmpl
