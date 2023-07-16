@@ -1,0 +1,7 @@
+ip:
+  kind1:
+    prometheus: 172.18.255.200
+    grafana: 172.18.255.201
+    loki: 172.18.255.202
+  kind2:
+    prometheus: 172.18.254.200

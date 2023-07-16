@@ -1,7 +1,7 @@
 server:
   service:
     type: LoadBalancer
-    loadBalancerIP: 172.18.255.200
+    loadBalancerIP: "{{ .StateValues.ip.kind1.prometheus }}"
   global:
     external_labels:
       cluster: kind1

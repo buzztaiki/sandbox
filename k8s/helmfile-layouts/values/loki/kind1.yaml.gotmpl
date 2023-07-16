@@ -9,7 +9,7 @@ loki:
 gateway:
   service:
     type: LoadBalancer
-    loadBalancerIP: 172.18.255.202
+    loadBalancerIP: "{{ .StateValues.ip.kind1.loki }}"
 singleBinary:
   replicas: 1
 monitoring:

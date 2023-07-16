@@ -1,6 +1,6 @@
 config:
   clients:
-    - url: http://172.18.255.202/loki/api/v1/push
+    - url: http://{{ .StateValues.ip.kind1.loki }}/loki/api/v1/push
       tenant_id: default
       external_labels:
         cluster: kind2

@@ -1,6 +1,6 @@
 service:
   type: LoadBalancer
-  loadBalancerIP: 172.18.255.201
+  loadBalancerIP: "{{ .StateValues.ip.kind1.grafana }}"
 adminPassword: "asdfjkl;"
 datasources:
   datasources.yaml:
@@ -8,7 +8,7 @@ datasources:
     datasources:
       - name: Prometheus | kind1
         type: prometheus
-        url: http://172.18.255.200
+        url: http://{{ .StateValues.ip.kind1.prometheus }}
       - name: Prometheus | kind2
         type: prometheus
-        url: http://172.18.254.200
+        url: http://{{ .StateValues.ip.kind2.prometheus }}

@@ -6,3 +6,5 @@ loki:
   enabled: false
 promtail:
   enabled: false
+victoria-metrics:
+  enabled: false

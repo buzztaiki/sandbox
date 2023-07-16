@@ -3,9 +3,9 @@ environments:
   kind1:
     kubeContext: kind-kind1
     values:
-      - environment-values.yaml
-      - cluster: kind1
-        prometheus:
+      - ../environment-values/default.yaml
+      - ../environment-values/ip.yaml
+      - prometheus:
           enabled: true
         grafana:
           enabled: true
@@ -13,15 +13,18 @@ environments:
           enabled: true
         promtail:
           enabled: true
+        victoria-metrics:
+          enabled: true
   kind2:
     kubeContext: kind-kind2
     values:
-      - environment-values.yaml
-      - cluster: kind2
-        prometheus:
+      - ../environment-values/default.yaml
+      - ../environment-values/ip.yaml
+      - prometheus:
           enabled: true
         promtail:
           enabled: true
+
 ---
 repositories:
   - name: prometheus-community
@@ -35,22 +38,22 @@ releases:
     namespace: prometheus
     condition: prometheus.enabled
     values:
-      - ../values/prometheus/{{ .Environment.Name }}.yaml
+      - ../values/prometheus/{{ .Environment.Name }}.yaml.gotmpl
   - name: grafana
     chart: grafana/grafana
     namespace: grafana
     condition: grafana.enabled
     values:
-      - ../values/grafana/{{ .Environment.Name }}.yaml
+      - ../values/grafana/{{ .Environment.Name }}.yaml.gotmpl
   - name: loki
     chart: grafana/loki
     namespace: loki
     condition: loki.enabled
     values:
-      - ../values/loki/{{ .Environment.Name }}.yaml
+      - ../values/loki/{{ .Environment.Name }}.yaml.gotmpl
   - name: promtail
     chart: grafana/promtail
     namespace: promtail
     condition: promtail.enabled
     values:
-      - ../values/promtail/{{ .Environment.Name }}.yaml
+      - ../values/promtail/{{ .Environment.Name }}.yaml.gotmpl
