@@ -25,6 +25,27 @@ prometheus:
     probeSelector: {}
     scrapeConfigSelector: {}
 
+# defaultRules:
+#     kubeProxy: false
+#     kubeSchedulerAlerting: false
+#     kubeSchedulerRecording: false
+#     kubeControllerManager: false
+
+
+# TODO: これらの pod は container port を公開してない。
+kubeScheduler:
+  enabled: false
+kubeProxy:
+  enabled: false
+kubeControllerManager:
+  enabled: false
+kubeEtcd:
+  # MEMO: node ip (172.18.0.2) でアクセスすれば繋ぐことはできる。NodePort サービスでもないのに。
+  # 証明書があれば以下で取れそうな気はする
+  #   curl -s https://172.18.0.2:2379/metrics --cacert /etc/kubernetes/pki/etcd/ca.crt --cert /etc/kubernetes/pki/etcd/server.crt --key /etc/kubernetes/pki/etcd/server.key
+  enabled: false
+
+
 grafana:
   enabled: false
   forceDeployDashboards: true
