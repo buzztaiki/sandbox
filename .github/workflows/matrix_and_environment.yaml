@@ -5,12 +5,15 @@ name: Matrix and Environment
 
 on:
   pull_request:
+    types:
+      - labeled
+    
 
 jobs:
   build:
     runs-on: ubuntu-latest
     environment: matrix_and_environment
-
+    if: github.event.action == 'labeled' && github.event.label.name == 'matrix_and_environment'
     strategy:
       matrix:
         node-version: ['14.x', '16.x']
