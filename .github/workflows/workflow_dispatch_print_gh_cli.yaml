@@ -1,0 +1,38 @@
+---
+# このワークフローの実行と同じ引数で gh workflow run を実行するコマンドを出力するワークフロー
+
+name: Workflow-Dispatch GitHub CLI Instruction
+run-name: Workflow-Dispatch Print GH Command Instruction - ${{ inputs.required-text }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      choice:
+        type: choice
+        options:
+          - moo
+          - woo
+          - nyaan
+        description: Choice
+      text:
+        type: string
+        description: Text
+      required-text:
+        type: string
+        required: true
+        description: Required Text
+      number:
+        type: number
+        description: Number
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: GH CLI Instruction
+        run: |
+          json=$(echo "$INPUTS_CONTEXT" | jq -c)
+          echo "echo '$json' | gh workflow run '${{ github.workflow }}' --ref '${{ github.ref_name }}' --json"
+          printf "cat <<'EOF' | gh workflow run '%s' --ref '%s' --json\n%s\nEOF\n" "${{ github.workflow }}" "${{ github.ref_name }}" "$json"
+        env:
+          INPUTS_CONTEXT: ${{ toJSON(inputs) }}
