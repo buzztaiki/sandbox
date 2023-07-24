@@ -32,7 +32,7 @@ jobs:
       - name: GH CLI Instruction
         run: |
           json=$(echo "$INPUTS_CONTEXT" | jq -c)
-          message="echo '$json' | gh workflow run '${{ github.workflow }}' --ref '${{ github.ref_name }}' --json"
-          echo "$message"
+          echo "echo '$json' | gh workflow run '${{ github.workflow }}' --ref '${{ github.ref_name }}' --json"
+          printf "cat <<'EOF' | gh workflow run '%s' --ref '%s' --json\n%s\nEOF\n" "${{ github.workflow }}" "${{ github.ref_name }}" "$json"
         env:
           INPUTS_CONTEXT: ${{ toJSON(inputs) }}
