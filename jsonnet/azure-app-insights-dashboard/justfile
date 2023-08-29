@@ -1,0 +1,13 @@
+export INCLUDES := '.*'
+export EXCLUDES := '^$'
+
+all: fetch_app_insights build
+
+build:
+    jsonnet -J vendor dashboard.jsonnet > dashboard.json
+
+fetch_app_insights:
+    az resource list \
+      | jq \
+          '[.[] | select((.type | test("microsoft.insights/components";"i")) and (.name | test(env.INCLUDES)) and (.name | test(env.EXCLUDES) | not))] | group_by(.resourceGroup) | map({key: .[0].resourceGroup, value: map(.name)}) | from_entries' \
+      > app-insights.json
