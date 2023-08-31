@@ -1,0 +1,16 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test
+spec:
+  replicas: 1
+  selector:
+  template:
+    metadata:
+    spec:
+      containers:
+        - name: test
+          image: nginx:latest
+          ports:
+            - containerPort: 80
