@@ -61,6 +61,7 @@ local main = (
   g.dashboard.new('Azure All App Insights')
   + g.dashboard.withTimezone('browser')
   + g.dashboard.withUid('7ab5509e-697d-44f6-a851-9d10fdbfbfd1')
+  + g.dashboard.withDescription('https://github.com/buzztaiki/sandbox/tree/main/jsonnet/azure-app-insights-dashboard')
   + g.dashboard.withVariables(variables)
   + g.dashboard.graphTooltip.withSharedCrosshair()
   + g.dashboard.withPanels(panels)
