@@ -1,0 +1,23 @@
+---
+# このワークフローの実行と同じ引数で gh workflow run を実行するコマンドを出力するワークフロー
+
+name: Test env is exported or not
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          export | grep -e 'XXX'
+          env | grep -e 'XXX'
+        env:
+          XXX: yyy
+      - run: |
+          export | grep -e 'XXX'
+          env | grep -e 'XXX'
+        shell: bash
+        env:
+          XXX: yyy
