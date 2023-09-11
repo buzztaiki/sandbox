@@ -4,6 +4,7 @@
 name: Test env is exported or not
 
 on:
+  pull_request:
   workflow_dispatch:
 
 jobs:
