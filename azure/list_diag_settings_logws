@@ -1,0 +1,56 @@
+#!/bin/bash
+set -e
+
+ignore_types=(
+  microsoft.alertsmanagement/smartdetectoralertrules
+  microsoft.automation/automationaccounts/configurations
+  microsoft.automation/automationaccounts/runbooks
+  microsoft.azureactivedirectory/b2cdirectories
+  microsoft.compute/availabilitysets
+  microsoft.compute/images
+  microsoft.compute/restorepointcollections
+  microsoft.compute/snapshots
+  microsoft.compute/sshpublickeys
+  microsoft.compute/virtualmachines/extensions
+  microsoft.containerregistry/registries/webhooks
+  microsoft.datamigration/services
+  microsoft.datamigration/services/projects
+  microsoft.devtestlab/schedules
+  microsoft.eventgrid/partnerconfigurations
+  microsoft.insights/actiongroups
+  microsoft.insights/activitylogalerts
+  microsoft.insights/metricalerts
+  microsoft.insights/scheduledqueryrules
+  microsoft.insights/webtests
+  microsoft.insights/workbooks
+  microsoft.machinelearningservices/workspaces/batchendpoints
+  microsoft.machinelearningservices/workspaces/batchendpoints/deployments
+  microsoft.managedidentity/userassignedidentities
+  microsoft.network/networkwatchers
+  microsoft.network/networkwatchers/flowlogs
+  microsoft.network/privatednszones/virtualnetworklinks
+  microsoft.operationalinsights/querypacks
+  microsoft.operationsmanagement/solutions
+  microsoft.portal/dashboards
+  microsoft.saas/resources
+  microsoft.security/automations
+  microsoft.visualstudio/account
+  microsoft.web/certificates
+)
+
+usage_exit() {
+  cat <<EOF
+usage: $0
+診断設定のログ分析ワークスペースを一覧表示する。
+EOF
+  exit "$1"
+}
+
+[[ $1 =~ -h|--help ]] && usage_exit 0
+[[ $# == 0 ]] || usage_exit 1 1>&2
+
+ignore_regex=$(IFS="|"; echo "${ignore_types[*]}")
+az resource list --query '[].[id, type]' -otsv |
+  grep -ivEe "$ignore_regex" |
+  awk '{print $1}' |
+  xargs -I% az monitor diagnostic-settings list --resource % -otsv --query '[].[id, workspaceId]'
