@@ -1,0 +1,20 @@
+image_name := "local/unix-domain-socket:local"
+cluster := "unix-domain-socket"
+context := "kind-" + cluster
+
+up: create_cluster deploy get_all
+down: delete_cluster
+
+create_cluster:
+    kind create cluster -n {{ cluster }}
+delete_cluster:
+    kind delete cluster -n {{ cluster }}
+build:
+    docker build -t {{ image_name }} .
+deploy: build
+    kind load docker-image -n {{ cluster }} {{ image_name }}
+    kubectl apply --context {{ context }} -f all.yaml --wait=true
+get_all:
+    kubectl --context {{ context }} -n unix-domain-socket get all
+tail:
+    kubectl stern --context {{ context }} -n unix-domain-socket test
