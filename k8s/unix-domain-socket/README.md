@@ -1,6 +1,8 @@
 # Pod で unix domain socket 使えるかテスト
 
-使えた。
+以下の二つのコンテナを pod で動かして、unix domain socket で通信できるかテストしてみた。
+- server: socat で /app/socket/test.sock を listen する
+- client: 1秒毎に /app/socket/test.sock に今の時間を書き込む
 
 ## デプロイ
 
