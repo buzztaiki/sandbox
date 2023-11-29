@@ -1,0 +1,12 @@
+---
+repositories:
+  - name: botkube
+    url: https://charts.botkube.io
+
+releases:
+  - name: botkube
+    namespace: botkube
+    chart: botkube/botkube
+    version: 1.6.0
+    values:
+      - values.yaml.gotmpl
