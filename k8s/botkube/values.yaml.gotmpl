@@ -1,5 +1,7 @@
 settings:
   clusterName: {{ .KubeContext }}
+  # log:
+  #   level: debug
 
 communications:
   default-group:
@@ -15,6 +17,19 @@ communications:
             sources:
               - k8s-recommendation-events
               - k8s-all-events
+          # NOTE: メンションなしで実行はできるんだけど、固定の文字列しか使えない。おしい。
+          # - https://github.com/kubeshop/botkube/blob/release-1.6/pkg/config/config.go#L181
+          # - https://github.com/kubeshop/botkube/blob/release-1.6/pkg/bot/slack_socket.go#L470
+          # NOTE: また、使うには message.channels を event subscription で許可する必要がある
+          # - https://github.com/kubeshop/botkube/blob/release-1.6/pkg/bot/slack_socket.go#L148
+          # messageTriggers:
+          #   - text:
+          #       include: [kubectl]
+          #     users:
+          #       exclude:
+          #         - <slack-bot-userid>
+          #     executors: [kubectl]
+          #     command: kubectl get pods -A
 
 rbac:
   # NOTE: この設定は ClusterRole を作る。つまり名前に気を付ける必要がある。
