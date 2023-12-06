@@ -1,5 +1,5 @@
 settings:
-  clusterName: {{ .KubeContext }}
+  clusterName: {{ .Environment.KubeContext }}
   # log:
   #   level: debug
 
@@ -7,11 +7,11 @@ communications:
   default-group:
     socketSlack:
       enabled: true
-      appToken: {{ requiredEnv "SLACK_APP_TOKEN" }}
-      botToken: {{ requiredEnv "SLACK_BOT_TOKEN" }}
+      appToken: {{ .Environment.Values.slackAppToken }}
+      botToken: {{ .Environment.Values.slackBotToken }}
       channels:
         default:
-          name: {{ requiredEnv "SLACK_CHANNEL" }}
+          name: {{ .Environment.Values.slackChannel }}
           bindings:
             executors: [kubectl]
             sources:

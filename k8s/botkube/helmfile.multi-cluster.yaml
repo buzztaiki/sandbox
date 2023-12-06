@@ -1,9 +1,16 @@
+# yaml-language-server: $schema=https://json.schemastore.org/helmfile.json
 ---
 environments:
-  default:
-    kubeContext: kind-kind
+  botkube1:
+    kubeContext: kind-botkube1
     values:
         - envs/default.yaml
+        - envs/botkube1.yaml
+  botkube2:
+    kubeContext: kind-botkube2
+    values:
+        - envs/default.yaml
+        - envs/botkube2.yaml
 
 ---
 repositories:
