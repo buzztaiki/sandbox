@@ -1,6 +1,4 @@
 ---
-# このワークフローの実行と同じ引数で gh workflow run を実行するコマンドを出力するワークフロー
-
 name: Test env is exported or not
 
 on:
