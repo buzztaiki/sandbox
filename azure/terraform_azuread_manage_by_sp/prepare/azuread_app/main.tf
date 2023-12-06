@@ -70,7 +70,7 @@ resource "local_sensitive_file" "tfvars" {
   content         = <<-EOT
     tenant_id       = "${data.azurerm_client_config.current.tenant_id}"
     subscription_id = "${data.azurerm_client_config.current.subscription_id}"
-    client_id       = "${azuread_service_principal.this.client_id}"
+    client_id       = "${azuread_application.this.client_id}"
     client_secret   = "${azuread_application_password.this.value}"
   EOT
   filename        = var.tfvars
