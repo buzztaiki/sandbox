@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: coredump
+  labels:
+    name: coredump
+spec:
+  containers:
+    - name: coredump
+      image: local/coredump:latest
+      imagePullPolicy: Never
+  restartPolicy: Never

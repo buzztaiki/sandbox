@@ -1,0 +1,26 @@
+kind_context := "coredump"
+kube_context := "kind-coredump"
+
+cluster_create:
+    kind create cluster -n {{ kind_context }}
+
+cluster_delete:
+    kind delete cluster -n {{ kind_context }}
+
+image_build:
+    docker build -t local/coredump .
+
+image_load:
+    kind load docker-image -n {{ kind_context }} local/coredump
+
+pod_apply:
+    kubectl --context {{ kube_context }} apply -f pod.yaml
+
+pod_delete:
+    kubectl --context {{ kube_context }} delete -f pod.yaml
+
+pod_describe:
+    kubectl --context {{ kube_context }} describe -f pod.yaml
+
+coredump_handler_apply:
+    helmfile --kube-context {{ kube_context }} apply

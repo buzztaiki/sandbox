@@ -1,0 +1,21 @@
+---
+repositories:
+  - name: core-dump-handler
+    url: https://ibm.github.io/core-dump-handler/
+
+releases:
+  - name: core-dump-handler
+    namespace: core-dump-handler
+    chart: core-dump-handler/core-dump-handler
+    version: v8.10.0
+    values:
+      - composer:
+          logLevel: Debug
+          coreEvents: true
+        daemonset:
+          useINotify: false
+          includeCrioExe: true
+          deployCrioConfig: true
+          mountContainerRuntimeEndpoint: true
+          hostContainerRuntimeEndpoint: /var/run/containerd/containerd.sock
+          crioEndpoint: unix:///var/run/containerd/containerd.sock
