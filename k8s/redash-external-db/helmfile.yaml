@@ -1,0 +1,29 @@
+---
+repositories:
+  - name: redash
+    url: https://getredash.github.io/contrib-helm-chart/
+  - name: bitnami
+    url: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
+  - name: k8s-as-helm
+    url: https://ameijer.github.io/k8s-as-helm
+
+releases:
+  - name: redash
+    namespace: redash
+    chart: redash/redash
+    version: 3.0.1
+    values:
+      - values-redash.yaml
+  - name: redash-external-secret
+    namespace: redash
+    chart: k8s-as-helm/secret
+    version: 1.0.4
+    values:
+      - secretData:
+          postgresql: postgresql://redash:redash@postgresql:5432/redash
+  - name: postgresql
+    namespace: redash
+    chart: bitnami/postgresql
+    version: 13.2.30
+    values:
+      - values-postgresql.yaml

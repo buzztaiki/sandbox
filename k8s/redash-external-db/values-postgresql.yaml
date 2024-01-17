@@ -1,0 +1,5 @@
+auth:
+  postgresPassword: postgres
+  username: redash
+  password: redash
+  database: redash
