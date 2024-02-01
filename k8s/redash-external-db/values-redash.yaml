@@ -1,0 +1,12 @@
+redash:
+  cookieSecret: redash
+  secretKey: redash
+  googleClientId: ref+file://local.yaml#googleClientId
+  googleClientSecret: ref+file://local.yaml#googleClientSecret
+redis:
+  password: redash
+postgresql:
+  enabled: false
+externalPostgreSQLSecret:
+  name: redash-external-secret
+  key: postgresql
