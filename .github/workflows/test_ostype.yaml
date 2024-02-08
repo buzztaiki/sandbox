@@ -1,0 +1,16 @@
+---
+name: Test OSTYPE
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  run:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - run: echo "$OSTYPE"
+        shell: bash
