@@ -14,6 +14,9 @@ releases:
     version: 3.0.1
     values:
       - values-redash.yaml
+    needs:
+      - redash-external-secret
+      - postgresql
   - name: redash-external-secret
     namespace: redash
     chart: k8s-as-helm/secret
@@ -27,3 +30,15 @@ releases:
     version: 13.2.30
     values:
       - values-postgresql.yaml
+  - name: redash-exporter
+    namespace: redash
+    chart: ./redash-exporter
+    needs:
+      - redash-exporter-secret
+  - name: redash-exporter-secret
+    namespace: redash
+    chart: k8s-as-helm/secret
+    version: 1.0.4
+    values:
+      - secretData:
+          redashAPIKey: ref+file://local.yaml#redashAPIKey

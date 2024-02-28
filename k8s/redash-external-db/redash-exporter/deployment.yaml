@@ -1,0 +1,26 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redash-exporter
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+        - name: redash-exporter
+          image: masahata/redash-exporter
+          ports:
+            - containerPort: 9295
+          args:
+            - --redashHost=redash
+            - --redashPort=80
+            - --redashScheme=http
+            - --redashVersion=10
+            - --metricsInterval=30
+          env:
+            - name: REDASH_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: redash-exporter-secret
+                  key: redashAPIKey
