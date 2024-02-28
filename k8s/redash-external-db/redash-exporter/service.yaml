@@ -5,7 +5,6 @@ metadata:
   name: redash-exporter
 spec:
   type: ClusterIP
-  clusterIP: None # headless service
   ports:
-  - port: 9295
-    targetPort: 9295
+    - name: http
+      port: 9295

@@ -9,4 +9,4 @@ alertmanager:
 kubernetesServiceMonitors:
   enabled: false
 defaultRules:
-  enabled: false
+  create: false

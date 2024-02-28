@@ -39,6 +39,7 @@ releases:
     chart: ./redash-exporter
     needs:
       - redash-exporter-secret
+      - promstack/promstack
   - name: redash-exporter-secret
     namespace: redash
     chart: k8s-as-helm/secret

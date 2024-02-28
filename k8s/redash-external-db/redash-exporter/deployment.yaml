@@ -11,7 +11,8 @@ spec:
         - name: redash-exporter
           image: masahata/redash-exporter
           ports:
-            - containerPort: 9295
+            - name: http
+              containerPort: 9295
           args:
             - --redashHost=redash
             - --redashPort=80
