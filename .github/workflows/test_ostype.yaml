@@ -1,0 +1,26 @@
+---
+name: Test OSTYPE
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  run:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - run: echo "$OSTYPE"
+        shell: bash
+  mac:
+    runs-on: macos-latest
+    steps:
+      - run: |
+          brew install detect-secrets
+          brew install pre-commit
+          brew install detect-secrets
+          brew install pre-commit
+
+
