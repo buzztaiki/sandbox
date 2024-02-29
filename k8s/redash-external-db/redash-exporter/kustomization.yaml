@@ -8,7 +8,6 @@ resources:
   - deployment.yaml
   - service.yaml
   - serviceMonitor.yaml
-  - prometheusRule.yaml
 
 commonLabels:
   app: redash-exporter
