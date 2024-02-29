@@ -1,0 +1,10 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: redash-exporter
+  labels:
+    release: promstack
+spec:
+  endpoints:
+    - port: http
+      path: /metrics

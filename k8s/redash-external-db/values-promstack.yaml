@@ -1,0 +1,12 @@
+---
+
+grafana:
+  enabled: false
+nodeExporter:
+  enabled: false
+alertmanager:
+  enabled: false
+kubernetesServiceMonitors:
+  enabled: false
+defaultRules:
+  create: false

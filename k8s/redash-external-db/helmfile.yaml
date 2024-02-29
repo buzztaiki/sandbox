@@ -6,6 +6,8 @@ repositories:
     url: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
   - name: k8s-as-helm
     url: https://ameijer.github.io/k8s-as-helm
+  - name: prometheus-community
+    url: https://prometheus-community.github.io/helm-charts
 
 releases:
   - name: redash
@@ -14,6 +16,9 @@ releases:
     version: 3.0.1
     values:
       - values-redash.yaml
+    needs:
+      - redash-external-secret
+      - postgresql
   - name: redash-external-secret
     namespace: redash
     chart: k8s-as-helm/secret
@@ -21,9 +26,31 @@ releases:
     values:
       - secretData:
           postgresql: postgresql://redash:redash@postgresql:5432/redash
+
   - name: postgresql
     namespace: redash
     chart: bitnami/postgresql
     version: 13.2.30
     values:
       - values-postgresql.yaml
+
+  - name: redash-exporter
+    namespace: redash
+    chart: ./redash-exporter
+    needs:
+      - redash-exporter-secret
+      - promstack/promstack
+  - name: redash-exporter-secret
+    namespace: redash
+    chart: k8s-as-helm/secret
+    version: 1.0.4
+    values:
+      - secretData:
+          redashAPIKey: ref+file://local.yaml#redashAPIKey
+
+  - name: promstack
+    namespace: promstack
+    chart: prometheus-community/kube-prometheus-stack
+    version: 56.14.0
+    values:
+      - values-promstack.yaml

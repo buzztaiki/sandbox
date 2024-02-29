@@ -1,0 +1,7 @@
+---
+
+commonLabels:
+  - path: spec/selector/matchLabels
+    create: true
+    group: monitoring.coreos.com
+    kind: ServiceMonitor
