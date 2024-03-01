@@ -8,5 +8,5 @@ redis:
 postgresql:
   enabled: false
 externalPostgreSQLSecret:
-  name: redash-external-secret
+  name: redash-postgresql-secret
   key: postgresql
