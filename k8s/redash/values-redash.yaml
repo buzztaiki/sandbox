@@ -3,6 +3,10 @@ redash:
   secretKey: redash
   googleClientId: ref+file://local.yaml#googleClientId
   googleClientSecret: ref+file://local.yaml#googleClientSecret
+
+  statsdHost: redash-statsd-exporter
+  statsdPort: 9125
+
 redis:
   password: redash
 postgresql:

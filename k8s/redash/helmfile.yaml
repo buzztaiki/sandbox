@@ -48,6 +48,16 @@ releases:
       - secretData:
           redashAPIKey: ref+file://local.yaml#redashAPIKey
 
+  - name: redash-statsd-exporter
+    namespace: redash
+    chart: prometheus-community/prometheus-statsd-exporter
+    version: 0.13.0
+    needs:
+      - redash
+      - promstack/promstack
+    values:
+      - values-redash-statsd-exporter.yaml
+
   - name: promstack
     namespace: promstack
     chart: prometheus-community/kube-prometheus-stack
