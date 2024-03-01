@@ -1,0 +1,35 @@
+---
+nameOverride: redash-statsd-exporter
+
+# extraArgs:
+#   - --log.level=debug
+
+statsd:
+  mappingConfig: |
+    # https://github.com/search?q=repo%3Agetredash%2Fredash+statsd_client&type=code
+    mappings:
+      # redash.db.queries.select
+      - match: "redash.db.*.*"
+        name: redash_db
+        labels:
+          table: "$1"
+          query: "$2"
+      # redash.rq.jobs.started.periodic
+      - match: "redash.rq.jobs.*.*"
+        name: redash_rq_jobs
+        labels:
+          phase: "$1"
+          queue: "$2"
+      # redash.requests.redash_ping.get
+      - match: "redash.requests.*.*"
+        name: redash_requests
+        labels:
+          route: "$1"
+          method: "$2"
+
+
+serviceMonitor:
+  enabled: true
+  namespace: ""
+  additionalLabels:
+    release: promstack

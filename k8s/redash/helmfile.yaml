@@ -17,16 +17,15 @@ releases:
     values:
       - values-redash.yaml
     needs:
-      - redash-external-secret
+      - redash-postgresql-secret
       - postgresql
-  - name: redash-external-secret
+  - name: redash-postgresql-secret
     namespace: redash
     chart: k8s-as-helm/secret
     version: 1.0.4
     values:
       - secretData:
           postgresql: postgresql://redash:redash@postgresql:5432/redash
-
   - name: postgresql
     namespace: redash
     chart: bitnami/postgresql
@@ -38,6 +37,7 @@ releases:
     namespace: redash
     chart: ./redash-exporter
     needs:
+      - redash
       - redash-exporter-secret
       - promstack/promstack
   - name: redash-exporter-secret
@@ -47,6 +47,16 @@ releases:
     values:
       - secretData:
           redashAPIKey: ref+file://local.yaml#redashAPIKey
+
+  - name: redash-statsd-exporter
+    namespace: redash
+    chart: prometheus-community/prometheus-statsd-exporter
+    version: 0.13.0
+    needs:
+      - redash
+      - promstack/promstack
+    values:
+      - values-redash-statsd-exporter.yaml
 
   - name: promstack
     namespace: promstack
