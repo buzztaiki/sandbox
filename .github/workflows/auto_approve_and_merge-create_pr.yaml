@@ -1,0 +1,20 @@
+---
+name: "Auto approve merge: Create PR"
+# Updated: 2024-05-17T18:46:14Z
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update
+        run: date --iso-8601=seconds --utc > gha/auto_approve_and_merge/update.txt
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: auto_approve_and_merge
+          title: "[Automated] Auto approve and merge"
+          labels: automated_pr,auto_approve_and_merge
