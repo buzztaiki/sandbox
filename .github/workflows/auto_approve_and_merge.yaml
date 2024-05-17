@@ -13,6 +13,9 @@ jobs:
   run:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: github.event.ref
       - name: Show Event
         run: echo "$event"
         env:
@@ -20,7 +23,9 @@ jobs:
       - name: Show actor
         run: echo "${{ github.actor }}"
       - name: Show PR Info
-        run: gh pr view "${pr_number}"
+        run: |
+          gh pr view "${pr_number}"
+          gh pr view
         env:
           GH_TOKEN: ${{ github.token }}
           pr_number: ${{ github.event.inputs.pr-number }}
