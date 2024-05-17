@@ -2,7 +2,7 @@
 name: Auto approve merge
 
 on:
-  workflow_dispatch:
+  pull_request:
 
 jobs:
   run:
@@ -20,6 +20,8 @@ jobs:
       - name: Approve
         # TODO: PR の作成とワークフローの実行が両方とも GITHUB_TOKEN で実行されるから、auto approve が拒否られる
         # Can not approve your own pull request (addPullRequestReview)
+        # deploy key で PR 作れるっぽいから、これ使ってあれすればいいかも
+        # https://github.com/puppetlabs/peter-evans-create-pull-request/blob/master/docs/concepts-guidelines.md#push-using-ssh-deploy-keys
         run: |
           gh pr review --approve
         env:
