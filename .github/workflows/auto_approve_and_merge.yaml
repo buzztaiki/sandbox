@@ -3,11 +3,6 @@ name: Auto approve merge
 
 on:
   workflow_dispatch:
-    inputs:
-      pr-number: 
-        description: 'PR number'
-        required: true
-        type: number
 
 jobs:
   run:
@@ -22,8 +17,6 @@ jobs:
         run: echo "${{ github.actor }}"
       - name: Show PR Info
         run: |
-          gh pr view "${pr_number}"
-          gh pr view
+          gh pr review --approve
         env:
           GH_TOKEN: ${{ github.token }}
-          pr_number: ${{ github.event.inputs.pr-number }}

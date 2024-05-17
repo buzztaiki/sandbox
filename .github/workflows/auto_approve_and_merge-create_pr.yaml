@@ -20,7 +20,7 @@ jobs:
           labels: automated_pr
       - name: Run auto approve and merge workflow
         if: steps.create-pr.outputs.pull-request-operation == 'created' || steps.create-pr.outputs.pull-request-operation == 'updated'
-        run: gh workflow run --ref auto_approve_and_merge auto_approve_and_merge.yaml -f pr-number="${pr_number}"
+        run: gh workflow run --ref auto_approve_and_merge auto_approve_and_merge.yaml
         env:
           GH_TOKEN: ${{ github.token }}
-          pr_number: ${{ steps.create-pr.outputs.pull-request-number }}
+
