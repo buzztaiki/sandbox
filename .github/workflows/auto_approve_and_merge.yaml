@@ -17,7 +17,9 @@ jobs:
           event: ${{ toJson(github.event) }}
       - name: Show actor
         run: echo "${{ github.actor }}"
-      - name: Show PR Info
+      - name: Approve
+        # TODO: PR の作成とワークフローの実行が両方とも GITHUB_TOKEN で実行されるから、auto approve が拒否られる
+        # Can not approve your own pull request (addPullRequestReview)
         run: |
           gh pr review --approve
         env:
