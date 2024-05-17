@@ -16,3 +16,5 @@ jobs:
         run: echo "${{ github.actor }}"
       - name: Show PR Info
         run: gh pr view auto_approve_and_merge
+        env:
+          GH_TOKEN: ${{ github.token }}
