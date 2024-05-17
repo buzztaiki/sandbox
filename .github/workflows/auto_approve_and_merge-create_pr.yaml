@@ -23,3 +23,4 @@ jobs:
         run: gh workflow run --ref auto_approve_and_merge auto_approve_and_merge.yaml
         env:
           GH_TOKEN: ${{ github.token }}
+

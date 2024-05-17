@@ -7,10 +7,18 @@ on:
 jobs:
   run:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
+      - uses: actions/checkout@v4
       - name: Show Event
         run: echo "$event"
         env:
-          labels: ${{ toJson(github.event) }}
+          event: ${{ toJson(github.event) }}
       - name: Show actor
         run: echo "${{ github.actor }}"
+      - name: Show PR Info
+        run: |
+          gh pr review --approve
+        env:
+          GH_TOKEN: ${{ github.token }}
