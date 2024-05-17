@@ -1,0 +1,13 @@
+---
+name: Auto approve merge
+
+on:
+  pull_request:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "$labels"
+        env:
+          labels: ${{ toJson(github.event.pull_request.labels) }}
