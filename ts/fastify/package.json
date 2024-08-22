@@ -10,6 +10,8 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@fastify/type-provider-typebox": "^4.1.0",
+    "@sinclair/typebox": "^0.33.7",
     "fastify": "^4.28.1"
   }
 }
