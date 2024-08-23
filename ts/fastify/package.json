@@ -10,8 +10,10 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@fastify/error": "^4.0.0",
     "@fastify/type-provider-typebox": "^4.1.0",
     "@sinclair/typebox": "^0.33.7",
-    "fastify": "^4.28.1"
+    "fastify": "^4.28.1",
+    "pino-pretty": "^11.2.2"
   }
 }
