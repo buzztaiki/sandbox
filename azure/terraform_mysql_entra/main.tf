@@ -1,7 +1,6 @@
 locals {
-  name = "mysql-entra"
   tags = {
-    name       = local.name
+    name       = var.name
     managed_by = "Terraform"
   }
 }
@@ -10,7 +9,7 @@ data "azuread_client_config" "current" {}
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_resource_group" "this" {
-  name     = local.name
+  name     = var.name
   location = "japaneast"
   tags     = local.tags
 }
@@ -24,12 +23,12 @@ resource "random_password" "this" {
 }
 
 resource "azurerm_mysql_flexible_server" "this" {
-  name                = local.name
+  name                = var.name
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
-  sku_name            = "B_Standard_B1s"
+  sku_name            = var.mysql_sku_name
 
-  administrator_login    = "mysql_fake_admin"
+  administrator_login    = var.mysql_admin_user
   administrator_password = random_password.this.result
   backup_retention_days  = 1
   tags                   = local.tags
@@ -47,8 +46,22 @@ resource "azurerm_mysql_flexible_server" "this" {
   }
 }
 
+resource "azapi_resource_action" "mysql_set_public_access" {
+  type        = "Microsoft.DBforMySQL/flexibleServers@2023-06-30"
+  resource_id = azurerm_mysql_flexible_server.this.id
+  method      = "PATCH"
+
+  body = {
+    properties = {
+      network = {
+        publicNetworkAccess = "Enabled"
+      }
+    }
+  }
+}
+
 resource "azurerm_mysql_flexible_server_firewall_rule" "this" {
-  name                = local.name
+  name                = "allow-all-public-access"
   resource_group_name = azurerm_resource_group.this.name
   server_name         = azurerm_mysql_flexible_server.this.name
   start_ip_address    = "0.0.0.0"
@@ -59,7 +72,7 @@ resource "azurerm_mysql_flexible_server_configuration" "this" {
   for_each = {
     "log_output"            = "FILE",
     "audit_log_enabled"     = "ON",
-    "audit_log_events"      = "CONNECTION,DDL,DCL",
+    "audit_log_events"      = var.mysql_audit_log_events,
     "performance_schema"    = "ON",
     "slow_query_log"        = "ON",
     "error_server_log_file" = "ON",
@@ -73,7 +86,7 @@ resource "azurerm_mysql_flexible_server_configuration" "this" {
 
 
 resource "azurerm_user_assigned_identity" "this" {
-  name                = local.name
+  name                = var.name
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
   tags                = local.tags
@@ -97,7 +110,7 @@ resource "azuread_app_role_assignment" "this" {
 }
 
 resource "azuread_group" "mysql_admin" {
-  display_name     = "${local.name}-admin"
+  display_name     = "${var.name}-admin"
   security_enabled = true
   members = [
     data.azuread_client_config.current.object_id,
@@ -105,7 +118,7 @@ resource "azuread_group" "mysql_admin" {
 }
 
 resource "azuread_group" "mysql_maintainer" {
-  display_name     = "${local.name}-maintainer"
+  display_name     = "${var.name}-maintainer"
   security_enabled = true
   members = [
     data.azuread_client_config.current.object_id,
@@ -113,7 +126,7 @@ resource "azuread_group" "mysql_maintainer" {
 }
 
 resource "azuread_group" "mysql_reader" {
-  display_name     = "${local.name}-reader"
+  display_name     = "${var.name}-reader"
   security_enabled = true
   members = [
     data.azuread_client_config.current.object_id,
@@ -129,14 +142,10 @@ resource "azurerm_mysql_flexible_server_active_directory_administrator" "this" {
 }
 
 resource "azurerm_log_analytics_workspace" "this" {
-  name                = local.name
+  name                = var.name
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
   tags                = local.tags
-}
-
-data "azurerm_monitor_diagnostic_categories" "mysql" {
-  resource_id = azurerm_mysql_flexible_server.this.id
 }
 
 resource "azurerm_monitor_diagnostic_setting" "mysql-all" {
@@ -144,11 +153,8 @@ resource "azurerm_monitor_diagnostic_setting" "mysql-all" {
   target_resource_id         = azurerm_mysql_flexible_server.this.id
   log_analytics_workspace_id = azurerm_log_analytics_workspace.this.id
 
-  dynamic "enabled_log" {
-    for_each = data.azurerm_monitor_diagnostic_categories.mysql.log_category_types
-    content {
-      category = enabled_log.value
-    }
+  enabled_log {
+    category_group = "audit"
   }
 
   metric {
