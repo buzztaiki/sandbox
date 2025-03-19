@@ -32,6 +32,9 @@ grant select on *.* to 'mysql-entra-reader';
 create aaduser if not exists 'mysql-entra-maintainer';
 -- all privileges はできないらしい
 grant select, insert, update, delete, create, drop, references, index, alter, create temporary tables, lock tables, execute, create view, show view, create routine, alter routine, event, trigger on *.* to 'mysql-entra-maintainer';
+
+create aaduser if not exists 'mysql-entra-parent';
+grant select on *.* to 'mysql-entra-parent';
 EOF
 ```
 
