@@ -50,3 +50,21 @@ resource "azuread_group" "mysql_reader" {
     data.azuread_client_config.current.object_id,
   ]
 }
+
+resource "azuread_group" "mysql_parent" {
+  display_name     = "${var.name}-parent"
+  description      = "ユーザーが直接所属しないグループ。"
+  security_enabled = true
+  members = [
+    azuread_group.mysql_child.object_id,
+  ]
+}
+
+resource "azuread_group" "mysql_child" {
+  display_name     = "${var.name}-child"
+  description      = "parent のメンバーになっているグループ。ユーザーはここに所属する。"
+  security_enabled = true
+  members = [
+    data.azuread_client_config.current.object_id,
+  ]
+}
