@@ -1,0 +1,31 @@
+---
+name: Auto approve merge
+
+on:
+  pull_request:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Show Event
+        run: echo "$event"
+        env:
+          event: ${{ toJson(github.event) }}
+      - name: Show actor
+        run: echo "${{ github.actor }}"
+      - name: Approve
+        # TODO: PR の作成とワークフローの実行が両方とも GITHUB_TOKEN で実行されるから、auto approve が拒否られる
+        # Can not approve your own pull request (addPullRequestReview)
+        # deploy key で PR 作れるっぽいから、これ使ってあれすればいいかも
+        # -> あくまで push に deploy key を使うだけで PR の作成は GITHUB_TOKEN ぽい
+        # https://github.com/puppetlabs/peter-evans-create-pull-request/blob/master/docs/concepts-guidelines.md#push-using-ssh-deploy-keys
+        # ↓によると、やっぱり git 操作だけらしい
+        # https://github.com/orgs/community/discussions/21997
+        run: |
+          gh pr review --approve
+        env:
+          GH_TOKEN: ${{ github.token }}
