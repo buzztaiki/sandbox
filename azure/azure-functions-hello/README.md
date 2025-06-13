@@ -20,6 +20,12 @@ https://learn.microsoft.com/en-us/azure/azure-functions/create-first-function-cl
 % npx func templates list -l typescript
 ```
 
+## azurite
+
+```
+docker compose -f ../azurite/compose.yaml up
+```
+
 ## http trigger
 
 ```
@@ -49,5 +55,9 @@ https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-event
 npx func new --name EventGridExample --template "Azure Event Grid trigger"
 ```
 
+
+```
+% npm start
+```
 
 https://learn.microsoft.com/en-us/azure/communication-services/how-tos/event-grid/local-testing-event-grid
