@@ -42,3 +42,12 @@ Functions:
 Hello, world!
 ```
 
+## event grid trigger
+https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-event-grid-trigger
+
+```
+npx func new --name EventGridExample --template "Azure Event Grid trigger"
+```
+
+
+https://learn.microsoft.com/en-us/azure/communication-services/how-tos/event-grid/local-testing-event-grid
