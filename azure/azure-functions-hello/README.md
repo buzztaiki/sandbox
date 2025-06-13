@@ -14,6 +14,12 @@ https://learn.microsoft.com/en-us/azure/azure-functions/create-first-function-cl
 % npx func --help
 ```
 
+## template list
+
+```
+% npx func templates list -l typescript
+```
+
 ## http trigger
 
 ```
