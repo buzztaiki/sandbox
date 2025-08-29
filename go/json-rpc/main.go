@@ -26,10 +26,14 @@ func main() {
 		f = tcpServer
 	case "stdio-server":
 		f = stdioServer
+	case "bidi-server":
+		f = bidiServer
 	case "tcp-client":
 		f = tcpClient
 	case "stdio-client":
 		f = stdioClient
+	case "bidi-client":
+		f = bidiClient
 	default:
 		log.Fatal("unknown mode", *mode)
 	}
@@ -189,4 +193,43 @@ func stdioClient(ctx context.Context, framer jsonrpc2.Framer) error {
 
 		go readCommandLoop(ctx, logger, ncon, con)
 	}
+}
+
+type rwcDialer struct {
+	rwc io.ReadWriteCloser
+}
+
+func (d *rwcDialer) Dial(context.Context) (io.ReadWriteCloser, error) {
+	return d.rwc, nil
+}
+
+func bidiServer(ctx context.Context, framer jsonrpc2.Framer) error {
+	logger := prefixLogger("bidi-server")
+
+	l, err := jsonrpc2.NetListener(ctx, "tcp", ":1234", jsonrpc2.NetListenOptions{})
+	if err != nil {
+		return nil
+	}
+
+	rwc, err := l.Accept(ctx)
+	con, err := jsonrpc2.Dial(ctx, &rwcDialer{rwc}, jsonrpc2.ConnectionOptions{Framer: framer, Handler: handler(logger)})
+	if err != nil {
+		return err
+	}
+	defer con.Close()
+
+	return readCommandLoop(ctx, logger, os.Stdin, con)
+}
+
+func bidiClient(ctx context.Context, framer jsonrpc2.Framer) error {
+	logger := prefixLogger("bidi-client")
+
+	d := jsonrpc2.NetDialer("tcp", "localhost:1234", net.Dialer{})
+	con, err := jsonrpc2.Dial(ctx, d, jsonrpc2.ConnectionOptions{Framer: framer, Handler: handler(logger)})
+	if err != nil {
+		return err
+	}
+	defer con.Close()
+
+	return readCommandLoop(ctx, logger, os.Stdin, con)
 }
