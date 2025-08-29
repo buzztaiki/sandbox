@@ -99,6 +99,16 @@ func readCommandLoop(ctx context.Context, logger *log.Logger, r io.Reader, con *
 	return nil
 }
 
+func bindStream(ctx context.Context, l jsonrpc2.Listener, r io.Reader, w io.Writer) error {
+	rwc, err := l.Accept(ctx)
+	if err != nil {
+		return err
+	}
+	go io.Copy(rwc, r)
+	go io.Copy(w, rwc)
+	return nil
+}
+
 func tcpServer(ctx context.Context, framer jsonrpc2.Framer) error {
 	logger := prefixLogger("tcp-server")
 
@@ -162,18 +172,9 @@ func stdioClient(ctx context.Context, framer jsonrpc2.Framer) error {
 	if err != nil {
 		return err
 	}
-	go func() {
-		pipe, err := l.Accept(ctx)
-		logger.Println("accepted pipe")
-		if err != nil {
-			logger.Println("error accepting pipe:", err)
-		}
-		go io.Copy(pipe, os.Stdin)
-		go io.Copy(os.Stdout, pipe)
-	}()
+	go bindStream(ctx, l, os.Stdin, os.Stdout)
 
-	d := l.Dialer()
-	con, err := jsonrpc2.Dial(ctx, d, jsonrpc2.ConnectionOptions{Framer: framer, Handler: logOnlyHandler(logger)})
+	con, err := jsonrpc2.Dial(ctx, l.Dialer(), jsonrpc2.ConnectionOptions{Framer: framer, Handler: logOnlyHandler(logger)})
 	if err != nil {
 		return err
 	}
