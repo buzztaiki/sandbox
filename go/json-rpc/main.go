@@ -4,13 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
+	"io"
 	"log"
+	"os"
 
 	"golang.org/x/exp/jsonrpc2"
 )
 
 func main() {
-	mode := flag.String("mode", "tcp-server", "mode")
+	mode := flag.String("mode", "tcp-server", "tcp-server,stdio-server")
 	useHeader := flag.Bool("use-header", false, "use header framer")
 	flag.Parse()
 
@@ -19,6 +21,8 @@ func main() {
 	switch (*mode) {
 	case "tcp-server":
 		f = tcpServer
+	case "stdio-server":
+		f = stdioServer
 	default:
 		log.Fatal("unknown mode", *mode)
 	}
@@ -59,6 +63,46 @@ func tcpServer(ctx context.Context, framer jsonrpc2.Framer) error {
 	if err != nil {
 		return err
 	}
+	server.Wait()
+
+	return nil
+}
+
+func stdioServer(ctx context.Context, framer jsonrpc2.Framer) error {
+	l, err := jsonrpc2.NetPipe(ctx)
+	if err != nil {
+		return err
+	}
+
+	server, err := jsonrpc2.Serve(ctx, l, jsonrpc2.ConnectionOptions{
+		Framer: framer,
+		Handler: jsonrpc2.HandlerFunc(func(ctx context.Context, r *jsonrpc2.Request) (any, error) {
+			if r.Method == "ping" {
+				return "pong", nil
+			}
+			if r.Method == "hello" {
+				var params struct {
+					Name string `json:"name"`
+				}
+				if err := json.Unmarshal(r.Params, &params); err != nil {
+					return nil, err
+				}
+				return "hello " + params.Name, nil
+			}
+			return nil, jsonrpc2.ErrMethodNotFound
+		}),
+	})
+	if err != nil {
+		return err
+	}
+
+	pipe, err := l.Dialer().Dial(ctx)
+	if err != nil {
+		return err
+	}
+	go io.Copy(pipe, os.Stdin)
+	go io.Copy(os.Stdout, pipe)
+
 	server.Wait()
 
 	return nil
