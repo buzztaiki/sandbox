@@ -28,6 +28,8 @@ func main() {
 		f = stdioServer
 	case "tcp-client":
 		f = tcpClient
+	case "stdio-client":
+		f = stdioClient
 	default:
 		log.Fatal("unknown mode", *mode)
 	}
@@ -144,4 +146,67 @@ func tcpClient(ctx context.Context, framer jsonrpc2.Framer) error {
 
 
 	return nil
+}
+
+func stdioClient(ctx context.Context, framer jsonrpc2.Framer) error {
+	l, err := jsonrpc2.NetPipe(ctx)
+	if err != nil {
+		return err
+	}
+	go func() {
+		pipe, err := l.Accept(ctx)
+		log.Println("accepted pipe")
+		if err != nil {
+			log.Println("error accepting pipe:", err)
+		}
+		go io.Copy(pipe, os.Stdin)
+		go io.Copy(os.Stdout, pipe)
+	}()
+
+	d := l.Dialer()
+	con, err := jsonrpc2.Dial(ctx, d, jsonrpc2.ConnectionOptions{
+		Framer: framer,
+		Handler: jsonrpc2.HandlerFunc(func(ctx context.Context, r *jsonrpc2.Request) (any, error) {
+			log.Println("[tcpClient] got request", r.Method)
+			return nil, nil
+		}),
+	})
+	if err != nil {
+		return err
+	}
+	defer con.Close()
+
+
+	nl, err := net.Listen("tcp", ":1234")
+	if err != nil {
+		return err
+	}
+
+	for {
+		nc, err := nl.Accept()
+		log.Print("accepted", nc.RemoteAddr())
+		if err != nil {
+			return err
+		}
+
+		go func() {
+			scanner := bufio.NewScanner(nc)
+			for scanner.Scan() {
+				line := scanner.Text()
+				xs := strings.Split(line, " ")
+				if len(xs) == 0 {
+					continue
+				}
+				log.Println("command", xs)
+
+				var res json.RawMessage
+				con.Call(ctx, xs[0], xs[1:]).Await(ctx, &res)
+				log.Println("[tcpClient] got result:", string(res))
+
+			}
+			if scanner.Err() != nil {
+				log.Println("scanner error:", scanner.Err())
+			}
+		}()
+	}
 }
