@@ -1,12 +1,15 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"encoding/json"
 	"flag"
 	"io"
 	"log"
+	"net"
 	"os"
+	"strings"
 
 	"golang.org/x/exp/jsonrpc2"
 )
@@ -23,6 +26,8 @@ func main() {
 		f = tcpServer
 	case "stdio-server":
 		f = stdioServer
+	case "tcp-client":
+		f = tcpClient
 	default:
 		log.Fatal("unknown mode", *mode)
 	}
@@ -49,13 +54,11 @@ func tcpServer(ctx context.Context, framer jsonrpc2.Framer) error {
 				return "pong", nil
 			}
 			if r.Method == "hello" {
-				var params struct {
-					Name string `json:"name"`
-				}
+				var params []string
 				if err := json.Unmarshal(r.Params, &params); err != nil {
 					return nil, err
 				}
-				return "hello " + params.Name, nil
+				return "hello " + strings.Join(params, " "), nil
 			}
 			return nil, jsonrpc2.ErrMethodNotFound
 		}),
@@ -104,6 +107,41 @@ func stdioServer(ctx context.Context, framer jsonrpc2.Framer) error {
 	go io.Copy(os.Stdout, pipe)
 
 	server.Wait()
+
+	return nil
+}
+
+func tcpClient(ctx context.Context, framer jsonrpc2.Framer) error {
+	d := jsonrpc2.NetDialer("tcp", "localhost:1234", net.Dialer{})
+	con, err := jsonrpc2.Dial(ctx, d, jsonrpc2.ConnectionOptions{
+		Framer: framer,
+		Handler: jsonrpc2.HandlerFunc(func(ctx context.Context, r *jsonrpc2.Request) (any, error) {
+			log.Println("[tcpClient] got request", r.Method)
+			return nil, nil
+		}),
+	})
+	if err != nil {
+		return err
+	}
+	defer con.Close()
+
+	scanner := bufio.NewScanner(os.Stdin)
+	for scanner.Scan() {
+		line := scanner.Text()
+		xs := strings.Split(line, " ")
+		if len(xs) == 0 {
+			continue
+		}
+		var res json.RawMessage
+		con.Call(ctx, xs[0], xs[1:]).Await(ctx, &res)
+		log.Println("[tcpClient] got result:", string(res))
+
+	}
+	if scanner.Err() != nil {
+		return scanner.Err()
+	}
+
+
 
 	return nil
 }
