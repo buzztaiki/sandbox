@@ -11,7 +11,6 @@ import (
 	"net"
 	"os"
 	"slices"
-	"strconv"
 	"strings"
 	"time"
 
@@ -58,23 +57,14 @@ func handler(logger *log.Logger) jsonrpc2.Handler {
 			return "pong", nil
 		}
 		if r.Method == "hello" {
-			var params []string
-			if err := json.Unmarshal(r.Params, &params); err != nil {
-				return nil, err
-			}
-			return "hello " + strings.Join(params, " "), nil
+			return "hello " + string(r.Params), nil
 		}
 		if r.Method == "sleep" {
-			var params []string
+			var params []int
 			if err := json.Unmarshal(r.Params, &params); err != nil {
 				return nil, err
 			}
-			n, err := strconv.Atoi(params[0])
-			if err != nil {
-				return nil, err
-			}
-
-			time.Sleep(time.Duration(n) * time.Second)
+			time.Sleep(time.Duration(params[0]) * time.Second)
 			return "awaiked", nil
 		}
 
@@ -95,14 +85,23 @@ func readCommandLoop(ctx context.Context, logger *log.Logger, r io.Reader, con *
 	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
 		line := scanner.Text()
-		xs := strings.Split(line, " ")
+		xs := strings.SplitN(line, " ", 2)
 		if len(xs) == 0 {
 			continue
 		}
-		logger.Println("command", xs)
 
+		method := xs[0]
+		var params json.RawMessage
+		if len(xs) > 1 {
+			if err := json.Unmarshal([]byte(xs[1]), &params); err != nil {
+				log.Println("invalid params:", err)
+				continue
+			}
+		}
+
+		logger.Println("send command", method, string(params))
 		var res json.RawMessage
-		if err := con.Call(ctx, xs[0], xs[1:]).Await(ctx, &res); err != nil {
+		if err := con.Call(ctx, method, params).Await(ctx, &res); err != nil {
 			logger.Println("error:", err)
 			continue
 		}
