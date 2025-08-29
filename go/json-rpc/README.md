@@ -11,6 +11,7 @@ https://pkg.go.dev/golang.org/x/exp/jsonrpc2 を使ってみるだけ
   - `NetDialer` は `net.Pipe` を使った実装だけど、Accept しないと Dial できない事に注意
 - `ConnectionOptions.Frame` で、Content-Type のありなしを選べる
 - リクエストの受信は `ConnectionOptions.Handler` で行う
+- Handle で長い時間がかかっても、他のリクエストに迷惑はかけない
 
 
 ## Example
