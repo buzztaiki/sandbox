@@ -7,34 +7,33 @@ import (
 	"flag"
 	"io"
 	"log"
+	"maps"
 	"net"
 	"os"
+	"slices"
+	"strconv"
 	"strings"
+	"time"
 
 	"golang.org/x/exp/jsonrpc2"
 )
 
 func main() {
-	mode := flag.String("mode", "tcp-server", "tcp-server,stdio-server")
+	modes := map[string]func(context.Context, jsonrpc2.Framer) error{
+		"tcp-server":   tcpServer,
+		"stdio-server": stdioServer,
+		"bidi-server":  bidiServer,
+		"tcp-client":   tcpClient,
+		"bidi-client":  bidiClient,
+	}
+
+	mode := flag.String("mode", "tcp-server", strings.Join(slices.Sorted(maps.Keys(modes)), " "))
 	useHeader := flag.Bool("use-header", false, "use header framer")
 	flag.Parse()
 
 	ctx := context.Background()
-	var f func(context.Context, jsonrpc2.Framer) error
-	switch *mode {
-	case "tcp-server":
-		f = tcpServer
-	case "stdio-server":
-		f = stdioServer
-	case "bidi-server":
-		f = bidiServer
-	case "tcp-client":
-		f = tcpClient
-	case "stdio-client":
-		f = stdioClient
-	case "bidi-client":
-		f = bidiClient
-	default:
+	f, ok := modes[*mode]
+	if !ok {
 		log.Fatal("unknown mode", *mode)
 	}
 
@@ -65,6 +64,20 @@ func handler(logger *log.Logger) jsonrpc2.Handler {
 			}
 			return "hello " + strings.Join(params, " "), nil
 		}
+		if r.Method == "sleep" {
+			var params []string
+			if err := json.Unmarshal(r.Params, &params); err != nil {
+				return nil, err
+			}
+			n, err := strconv.Atoi(params[0])
+			if err != nil {
+				return nil, err
+			}
+
+			time.Sleep(time.Duration(n) * time.Second)
+			return "awaiked", nil
+		}
+
 		return nil, jsonrpc2.ErrMethodNotFound
 	}
 	return jsonrpc2.HandlerFunc(f)
@@ -89,7 +102,10 @@ func readCommandLoop(ctx context.Context, logger *log.Logger, r io.Reader, con *
 		logger.Println("command", xs)
 
 		var res json.RawMessage
-		con.Call(ctx, xs[0], xs[1:]).Await(ctx, &res)
+		if err := con.Call(ctx, xs[0], xs[1:]).Await(ctx, &res); err != nil {
+			logger.Println("error:", err)
+			continue
+		}
 		logger.Println("got result:", string(res))
 
 	}
@@ -163,37 +179,6 @@ func tcpClient(ctx context.Context, framer jsonrpc2.Framer) error {
 	}
 	defer con.Close()
 	return readCommandLoop(ctx, logger, os.Stdin, con)
-}
-
-func stdioClient(ctx context.Context, framer jsonrpc2.Framer) error {
-	logger := prefixLogger("tcp-client")
-
-	l, err := jsonrpc2.NetPipe(ctx)
-	if err != nil {
-		return err
-	}
-	go bindStream(ctx, l, os.Stdin, os.Stdout)
-
-	con, err := jsonrpc2.Dial(ctx, l.Dialer(), jsonrpc2.ConnectionOptions{Framer: framer, Handler: logOnlyHandler(logger)})
-	if err != nil {
-		return err
-	}
-	defer con.Close()
-
-	nl, err := net.Listen("tcp", ":1234")
-	if err != nil {
-		return err
-	}
-
-	for {
-		ncon, err := nl.Accept()
-		logger.Print("accepted", ncon.RemoteAddr())
-		if err != nil {
-			return err
-		}
-
-		go readCommandLoop(ctx, logger, ncon, con)
-	}
 }
 
 type rwcDialer struct {
