@@ -1,0 +1,4 @@
+HelloPerson: "こんにちは {{.Name}}"
+validation_required: "必須項目です"
+validation_max_less_equal_than_required: "{{.threshold}} を超えています"
+validation_sex: "male または femail を指定してください"
