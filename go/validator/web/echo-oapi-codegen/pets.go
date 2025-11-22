@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"net/http"
 	"sync"
 
@@ -24,24 +23,24 @@ func NewPetHandler() *PetHandler {
 
 // Add a new pet to the store
 // (POST /pet)
-func (h *PetHandler) AddPet(ctx echo.Context) error {
+func (h *PetHandler) AddPet(c echo.Context) error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
 	var pet petstore.Pet
-	ctx.Bind(&pet)
+	c.Bind(&pet)
 
 	h.lastID += 1
 	index := h.lastID
 	pet.Id = &index
 	h.pets[index] = &pet
 
-	return ctx.JSON(http.StatusOK, &pet)
+	return c.JSON(http.StatusOK, &pet)
 }
 
 // Deletes a pet
 // (DELETE /pet/{petId})
-func (h *PetHandler) DeletePet(ctx echo.Context, petId int64) error {
+func (h *PetHandler) DeletePet(c echo.Context, petId int64) error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
@@ -50,27 +49,26 @@ func (h *PetHandler) DeletePet(ctx echo.Context, petId int64) error {
 		return echo.ErrNotFound
 	}
 	delete(h.pets, petId)
-	return ctx.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusOK)
 }
 
 // Find pet by ID
 // (GET /pet/{petId})
-func (h *PetHandler) GetPetById(ctx echo.Context, petId int64) error {
+func (h *PetHandler) GetPetById(c echo.Context, petId int64) error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
-	log.Println("aaa")
 
 	pet, ok := h.pets[petId]
 	if !ok {
 		return echo.ErrNotFound
 	}
 
-	return ctx.JSON(http.StatusOK, &pet)
+	return c.JSON(http.StatusOK, &pet)
 }
 
 // Updates a pet in the store
 // (POST /pet/{petId})
-func (h *PetHandler) UpdatePet(ctx echo.Context, petId int64, params petstore.UpdatePetParams) error {
+func (h *PetHandler) UpdatePet(c echo.Context, petId int64, params petstore.UpdatePetParams) error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
@@ -79,8 +77,13 @@ func (h *PetHandler) UpdatePet(ctx echo.Context, petId int64, params petstore.Up
 		return echo.ErrNotFound
 	}
 
-	pet.Name = *params.Name
-	pet.Status = params.Status
+	if params.Name != nil {
+		pet.Name = *params.Name
+	}
+	if params.Status != nil {
+		pet.Status = params.Status
+	}
+	h.pets[petId] = pet
 
-	return ctx.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusOK)
 }
