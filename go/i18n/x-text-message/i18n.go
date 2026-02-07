@@ -1,6 +1,7 @@
 package xtextmessage
 
 import (
+	_ "github.com/buzztaiki/sandbox/go/i18n/x-text-message/locales"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
 )

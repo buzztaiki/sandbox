@@ -1,0 +1,33 @@
+{
+    "language": "ja-JP",
+    "messages": [
+        {
+            "id": "Hello, World!",
+            "message": "Hello, World!",
+            "translation": ""
+        },
+        {
+            "id": "Purchased {Item} at {Place}.",
+            "message": "Purchased {Item} at {Place}.",
+            "translation": "",
+            "placeholders": [
+                {
+                    "id": "Item",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "item"
+                },
+                {
+                    "id": "Place",
+                    "string": "%[2]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 2,
+                    "expr": "place"
+                }
+            ]
+        }
+    ]
+}
