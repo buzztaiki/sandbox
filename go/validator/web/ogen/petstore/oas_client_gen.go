@@ -427,7 +427,7 @@ func (c *Client) sendUpdatePet(ctx context.Context, params UpdatePetParams) (res
 		cfg := uri.QueryParameterEncodingConfig{
 			Name:    "name",
 			Style:   uri.QueryStyleForm,
-			Explode: true,
+			Explode: false,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
@@ -444,7 +444,7 @@ func (c *Client) sendUpdatePet(ctx context.Context, params UpdatePetParams) (res
 		cfg := uri.QueryParameterEncodingConfig{
 			Name:    "status",
 			Style:   uri.QueryStyleForm,
-			Explode: true,
+			Explode: false,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {

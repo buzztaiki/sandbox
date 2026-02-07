@@ -17,7 +17,7 @@ import (
 
 // DeletePetParams is parameters of deletePet operation.
 type DeletePetParams struct {
-	// Pet id to delete.
+	// Pet ID to delete.
 	PetId int64
 }
 
@@ -238,7 +238,7 @@ func decodeUpdatePetParams(args [1]string, argsEscaped bool, r *http.Request) (p
 		cfg := uri.QueryParameterDecodingConfig{
 			Name:    "name",
 			Style:   uri.QueryStyleForm,
-			Explode: true,
+			Explode: false,
 		}
 
 		if err := q.HasParam(cfg); err == nil {
@@ -279,7 +279,7 @@ func decodeUpdatePetParams(args [1]string, argsEscaped bool, r *http.Request) (p
 		cfg := uri.QueryParameterDecodingConfig{
 			Name:    "status",
 			Style:   uri.QueryStyleForm,
-			Explode: true,
+			Explode: false,
 		}
 
 		if err := q.HasParam(cfg); err == nil {
