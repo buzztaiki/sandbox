@@ -1,6 +1,6 @@
 .PHONY: pot
 pot:
-	go run github.com/leonelquinteros/gotext/cli/xgotext@latest -in . -out ./po
+	go tool xgotext -in . -out ./po
 
 .PHONY: msginit
 msginit:
