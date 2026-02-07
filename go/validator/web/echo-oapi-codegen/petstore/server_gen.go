@@ -88,14 +88,14 @@ func (w *ServerInterfaceWrapper) UpdatePet(ctx echo.Context) error {
 	var params UpdatePetParams
 	// ------------- Optional query parameter "name" -------------
 
-	err = runtime.BindQueryParameter("form", true, false, "name", ctx.QueryParams(), &params.Name)
+	err = runtime.BindQueryParameter("form", false, false, "name", ctx.QueryParams(), &params.Name)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter name: %s", err))
 	}
 
 	// ------------- Optional query parameter "status" -------------
 
-	err = runtime.BindQueryParameter("form", true, false, "status", ctx.QueryParams(), &params.Status)
+	err = runtime.BindQueryParameter("form", false, false, "status", ctx.QueryParams(), &params.Status)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter status: %s", err))
 	}

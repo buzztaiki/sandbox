@@ -16,11 +16,11 @@ type Pet struct {
 	Name      string    `json:"name"`
 	PhotoUrls *[]string `json:"photoUrls,omitempty"`
 
-	// Status pet status in the store
+	// Status pet status in the store.
 	Status *PetStatus `json:"status,omitempty"`
 }
 
-// PetStatus pet status in the store
+// PetStatus pet status in the store.
 type PetStatus string
 
 // UpdatePetParams defines parameters for UpdatePet.
