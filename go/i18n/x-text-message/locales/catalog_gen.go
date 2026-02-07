@@ -50,9 +50,10 @@ var en_USIndex = []uint32{ // 3 elements
 const en_USData string = "\x02Hello, World!\x02Purchased %[1]s at %[2]s."
 
 var ja_JPIndex = []uint32{ // 3 elements
-	0x00000000, 0x00000000, 0x00000000,
+	0x00000000, 0x00000019, 0x0000003f,
 } // Size: 36 bytes
 
-const ja_JPData string = ""
+const ja_JPData string = "" + // Size: 63 bytes
+	"\x02こんにちは世界！\x02%[2]sで%[1]sを購入しました。"
 
-// Total table size 112 bytes (0KiB); checksum: C050B15D
+	// Total table size 175 bytes (0KiB); checksum: 3460DDE2

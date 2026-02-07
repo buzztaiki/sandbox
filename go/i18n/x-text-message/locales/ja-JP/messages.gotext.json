@@ -4,12 +4,12 @@
         {
             "id": "Hello, World!",
             "message": "Hello, World!",
-            "translation": ""
+            "translation": "こんにちは世界！"
         },
         {
             "id": "Purchased {Item} at {Place}.",
             "message": "Purchased {Item} at {Place}.",
-            "translation": "",
+            "translation": "{Place}で{Item}を購入しました。",
             "placeholders": [
                 {
                     "id": "Item",
