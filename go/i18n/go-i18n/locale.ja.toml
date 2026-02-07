@@ -1,0 +1,5 @@
+[helloWorld]
+other = "こんにちは世界！"
+
+[purchase]
+other = "{{.location}}で{{.product}}を購入しました。"

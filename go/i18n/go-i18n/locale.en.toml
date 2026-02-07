@@ -1,0 +1,5 @@
+[helloWorld]
+other = "Hello, world!"
+
+[purchase]
+other = "Purchased {{.product}} at {{.location}}."
