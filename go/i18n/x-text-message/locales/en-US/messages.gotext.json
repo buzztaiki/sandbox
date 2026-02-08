@@ -1,0 +1,37 @@
+{
+    "language": "en-US",
+    "messages": [
+        {
+            "id": "Hello, World!",
+            "message": "Hello, World!",
+            "translation": "Hello, World!",
+            "translatorComment": "Copied from source.",
+            "fuzzy": true
+        },
+        {
+            "id": "Purchased {Item} at {Place}.",
+            "message": "Purchased {Item} at {Place}.",
+            "translation": "Purchased {Item} at {Place}.",
+            "translatorComment": "Copied from source.",
+            "placeholders": [
+                {
+                    "id": "Item",
+                    "string": "%[1]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 1,
+                    "expr": "item"
+                },
+                {
+                    "id": "Place",
+                    "string": "%[2]s",
+                    "type": "string",
+                    "underlyingType": "string",
+                    "argNum": 2,
+                    "expr": "place"
+                }
+            ],
+            "fuzzy": true
+        }
+    ]
+}
