@@ -1,0 +1,26 @@
+prometheus:
+  enabled: false
+alertmanager:
+  enabled: false
+grafana:
+  adminUser: admin
+  adminPassword: asdfjkl;
+  sidecar:
+    datasources:
+      defaultDatasourceEnabled: false
+  additionalDataSources:
+    - name: Prometheus
+      uid: prometheus
+      type: prometheus
+      url: http://mimir-gateway.mimir.svc/prometheus/
+      isDefault: true
+      jsonData:
+        prometheusType: Mimir
+        prometheusVersion: "2.9.1"
+    - name: Alertmanager
+      uid: alertmanager
+      type: alertmanager
+      url: http://mimir-gateway.mimir.svc:8080/alertmanager/
+      jsonData:
+        handleGrafanaManagedAlerts: false
+        implementation: prometheus
