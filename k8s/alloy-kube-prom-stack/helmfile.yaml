@@ -14,6 +14,8 @@ releases:
     chart: grafana/alloy
     version: 1.6.0
     namespace: alloy
+    values:
+      - alloy/values.yaml
   - name: mimir
     chart: grafana/mimir-distributed
     version: 6.0.5
