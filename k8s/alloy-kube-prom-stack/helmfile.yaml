@@ -20,3 +20,5 @@ releases:
     chart: grafana/mimir-distributed
     version: 6.0.5
     namespace: mimir
+    values:
+      - mimir/values.yaml

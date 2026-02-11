@@ -14,14 +14,17 @@ alloy:
         level = "info"
         format = "logfmt"
       }
-      prometheus.remote_write "mimir" {
+      prometheus.remote_write "main" {
         endpoint {
           url = "http://mimir-gateway.mimir.svc/api/v1/push"
         }
       }
-      prometheus.operator.servicemonitors "services" {
-        forward_to = [prometheus.remote_write.mimir.receiver]
+      prometheus.operator.servicemonitors "main" {
+        forward_to = [prometheus.remote_write.main.receiver]
       }
-      prometheus.operator.podmonitors "pods" {
-        forward_to = [prometheus.remote_write.mimir.receiver]
+      prometheus.operator.podmonitors "main" {
+        forward_to = [prometheus.remote_write.main.receiver]
+      }
+      mimir.rules.kubernetes "main" {
+        address = "http://mimir-gateway.mimir.svc"
       }
