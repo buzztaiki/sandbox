@@ -3,17 +3,21 @@
 https://grafana.com/docs/alloy/latest/
 
 以下をやってみる
-- nodes: 2
-- alloy
-  - prometheus.exporter.self
-  - prometheus.operator.podmonitors
-  - prometheus.operator.servicemonitors
+- [ ] clusters: 2
+- [ ] alloy
+  - [ ] self monitoring
+  - [x] prometheus.operator.podmonitors
+  - [x] prometheus.operator.servicemonitors
+  - [x] mimir.rules.kubernetes
+  - [ ] cluster laberl
 - kube-prom-stack
-  - without prometheus or alertmanager
-  - crds
-  - exporters & service monitors
-  - rules
-  - grafana
-  - dashboards
-- mimir
-- loki
+  - [x] without prometheus or alertmanager
+  - [x] crds
+  - [x] exporters & service monitors
+  - [x] rules
+  - [x] grafana
+  - [x] dashboards
+- [x] mimir
+  - [ ] ruler
+  - [ ] alertmanager
+- [ ] loki
