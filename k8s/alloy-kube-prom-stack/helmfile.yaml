@@ -22,3 +22,9 @@ releases:
     namespace: mimir
     values:
       - mimir/values.yaml
+  - name: loki
+    chart: grafana/loki
+    version: 6.53.0
+    namespace: loki
+    values:
+      - loki/values.yaml
