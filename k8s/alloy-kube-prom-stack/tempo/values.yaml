@@ -1,4 +1,5 @@
 multitenancyEnabled: true
+
 traces:
   otlp:
     grpc:
@@ -11,6 +12,23 @@ gateway:
 
 metricsGenerator:
   enabled: true
+  config:
+    storage:
+      remote_write:
+        - url: http://mimir-gateway.mimir.svc/api/v1/push
+          send_exemplars: true
+
+metaMonitoring:
+  serviceMonitor:
+    enabled: true
+
+overrides:
+  defaults:
+    metrics_generator:
+      processors:
+        - service-graphs
+        - span-metrics
+        - local-blocks
 #
 # storage:
 #   trace:
