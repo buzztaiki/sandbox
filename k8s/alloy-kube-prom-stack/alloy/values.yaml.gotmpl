@@ -1,0 +1,6 @@
+alloy:
+  mounts:
+    varlog: true
+  configMap:
+    content: |
+      {{- readFile "config.alloy" | nindent 6 }}
