@@ -38,3 +38,11 @@ grafana:
         httpHeaderName1: X-Scope-OrgID
       secureJsonData:
         httpHeaderValue1: kind
+    - name: Tempo
+      uid: tempo
+      type: tempo
+      url: http://tempo-gateway.tempo.svc
+      jsonData:
+        httpHeaderName1: X-Scope-OrgID
+      secureJsonData:
+        httpHeaderValue1: kind

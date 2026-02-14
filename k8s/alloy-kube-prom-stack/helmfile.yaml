@@ -2,6 +2,8 @@
 repositories:
   - name: grafana
     url: https://grafana.github.io/helm-charts
+  - name: grafana-community
+    url: https://grafana-community.github.io/helm-charts
 
 releases:
   - name: kube-prometheus-stack
@@ -28,3 +30,9 @@ releases:
     namespace: loki
     values:
       - loki/values.yaml
+  - name: tempo
+    chart: grafana-community/tempo-distributed
+    version: 2.1.2
+    namespace: tempo
+    values:
+      - tempo/values.yaml

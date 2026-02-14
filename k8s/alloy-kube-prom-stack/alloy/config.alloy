@@ -31,6 +31,7 @@ prometheus.remote_write "default" {
     cluster = "kind",
   }
 }
+
 mimir.rules.kubernetes "default" {
   address = "http://mimir-gateway.mimir.svc"
   tenant_id = "kind"
@@ -43,6 +44,18 @@ loki.write "default" {
   }
   external_labels = {
     cluster = "kind",
+  }
+}
+
+otelcol.exporter.otlphttp "default" {
+  client {
+    endpoint = "http://tempo-gateway.tempo.svc"
+    tls {
+      insecure = true
+    }
+    headers = {
+      "X-Scope-OrgID" = "kind",
+    }
   }
 }
 
@@ -122,4 +135,30 @@ loki.source.kubernetes_events "cluster_events" {
   forward_to = [
     loki.write.default.receiver,
   ]
+}
+
+// ----------------
+// Open Telemetry
+// ----------------
+
+otelcol.receiver.otlp "default" {
+  grpc {
+    endpoint = "0.0.0.0:4317"
+  }
+  http {
+    endpoint = "0.0.0.0:4318"
+  }
+  output {
+    metrics = [otelcol.processor.batch.default.input]
+    logs    = [otelcol.processor.batch.default.input]
+    traces  = [otelcol.processor.batch.default.input]
+  }
+}
+
+otelcol.processor.batch "default" {
+  output {
+    metrics = [otelcol.exporter.otlphttp.default.input]
+    logs    = [otelcol.exporter.otlphttp.default.input]
+    traces  = [otelcol.exporter.otlphttp.default.input]
+  }
 }
