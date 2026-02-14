@@ -36,3 +36,6 @@ releases:
     namespace: tempo
     values:
       - tempo/values.yaml
+  - name: mythical
+    chart: ./mythical
+    namespace: mythical
