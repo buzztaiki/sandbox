@@ -58,6 +58,18 @@ otelcol.exporter.otlphttp "default" {
     }
   }
 }
+otelcol.processor.transform "external_labels" {
+  // error_mode = "ignore"
+  trace_statements {
+    context = "resource"
+    statements = [`set(resource.attributes["k8s.cluster.name"], "kind")`]
+  }
+  output {
+    metrics = [otelcol.exporter.otlphttp.default.input]
+    logs    = [otelcol.exporter.otlphttp.default.input]
+    traces  = [otelcol.exporter.otlphttp.default.input]
+  }
+}
 
 prometheus.operator.servicemonitors "default" {
   forward_to = [prometheus.remote_write.default.receiver]
@@ -149,6 +161,29 @@ otelcol.receiver.otlp "default" {
     endpoint = "0.0.0.0:4318"
   }
   output {
+    metrics = [otelcol.processor.k8sattributes.default.input]
+    logs    = [otelcol.processor.k8sattributes.default.input]
+    traces  = [otelcol.processor.k8sattributes.default.input]
+  }
+}
+
+otelcol.processor.k8sattributes "default" {
+  extract {
+    otel_annotations = true
+    metadata = [
+      "k8s.namespace.name",
+      "k8s.deployment.name",
+      "k8s.statefulset.name",
+      "k8s.daemonset.name",
+      "k8s.cronjob.name",
+      "k8s.job.name",
+      "k8s.node.name",
+      "k8s.pod.name",
+      "k8s.container.name",
+    ]
+  }
+
+  output {
     metrics = [otelcol.processor.batch.default.input]
     logs    = [otelcol.processor.batch.default.input]
     traces  = [otelcol.processor.batch.default.input]
@@ -157,8 +192,8 @@ otelcol.receiver.otlp "default" {
 
 otelcol.processor.batch "default" {
   output {
-    metrics = [otelcol.exporter.otlphttp.default.input]
-    logs    = [otelcol.exporter.otlphttp.default.input]
-    traces  = [otelcol.exporter.otlphttp.default.input]
+    metrics = [otelcol.processor.transform.external_labels.input]
+    logs    = [otelcol.processor.transform.external_labels.input]
+    traces  = [otelcol.processor.transform.external_labels.input]
   }
 }
