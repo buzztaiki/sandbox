@@ -1,5 +1,8 @@
 deploymentMode: SimpleScalable
 
+minio:
+  enabled: false
+
 loki:
   storage:
     type: s3
@@ -36,12 +39,19 @@ loki:
     # volume 集計を有効にする
     volume_enabled: true
 
-minio:
-  enabled: false
-
 backend:
   replicas: 2
 read:
   replicas: 2
 write:
   replicas: 3
+
+clusterLabelOverride: kind
+monitoring:
+  dashboards:
+    enabled: true
+  serviceMonitor:
+    enabled: true
+  rules:
+    enabled: true
+    alerting: true

@@ -22,5 +22,16 @@ mimir:
         <<: *s3
         bucket_name: mimir-ruler
 
+metaMonitoring:
+  dashboards:
+    enabled: true
+  serviceMonitor:
+    enabled: true
+    clusterLabel: null
+  prometheusRule:
+    enabled: true
+    mimirAlerts: true
+    mimirRules: true
+
 minio:
   enabled: false
