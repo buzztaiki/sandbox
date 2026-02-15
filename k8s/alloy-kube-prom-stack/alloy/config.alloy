@@ -139,7 +139,7 @@ loki.source.file "pod_logs" {
 // Cluster Events
 // ----------------
 
-loki.source.kubernetes_events "cluster_events" {
+loki.source.kubernetes_events "default" {
   job_name   = "integrations/kubernetes/eventhandler"
   log_format = "logfmt"
   forward_to = [
@@ -193,6 +193,14 @@ otelcol.processor.memory_limiter "default" {
 otelcol.processor.probabilistic_sampler "default" {
   sampling_percentage = sys.env("OTEL_SAMPLING_RATE")
 
+  output {
+    traces  = [otelcol.processor.resourcedetection.default.input]
+  }
+}
+
+otelcol.processor.resourcedetection "default" {
+  // NOTE: 環境によって detectors を変える
+  detectors = ["env", "system"]
   output {
     traces  = [otelcol.processor.k8sattributes.default.input]
   }
