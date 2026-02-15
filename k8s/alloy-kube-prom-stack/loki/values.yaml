@@ -26,13 +26,21 @@ loki:
           prefix: loki_index_
           period: 24h
 
+  commonConfig:
+    replication_factor: 2
+
   ingester:
     chunk_encoding: snappy
+    wal:
+      flush_on_shutdown: true
+
   querier:
     max_concurrent: 4
+
   pattern_ingester:
     # pattern の自動解析を有効にする
     enabled: true
+
   limits_config:
     # インデックス化されない構造化データを保持可能にする
     allow_structured_metadata: true

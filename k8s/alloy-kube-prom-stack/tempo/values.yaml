@@ -25,6 +25,11 @@ overrides:
         - span-metrics
         - local-blocks
 
+ingester:
+  config:
+    flush_all_on_shutdown: true
+    replication_factor: 2
+
 metricsGenerator:
   enabled: true
   config:

@@ -16,11 +16,16 @@ mimir:
       s3:
         <<: *s3
         bucket_name: mimir-tsdb
+      tsdb:
+        flush_blocks_on_shutdown: true
     ruler_storage:
       backend: s3
       s3:
         <<: *s3
         bucket_name: mimir-ruler
+    ingester:
+      ring:
+        replication_factor: 2
 
 metaMonitoring:
   dashboards:
