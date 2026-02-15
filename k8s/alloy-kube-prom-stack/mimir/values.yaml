@@ -1,8 +1,8 @@
 mimir:
   structuredConfig:
     limits:
-      # デフォルトの20では monitoring-mixin の rule は収まらない
-      ruler_max_rules_per_rule_group: 30
+      ruler_max_rules_per_rule_group: 30 # デフォルトの20では monitoring-mixin の rule は収まらない
+      max_global_exemplars_per_user: 100000 # exempler として送られてきた trace id 等を保存可能にする
     alertmanager_storage:
       backend: s3
       s3: &s3
