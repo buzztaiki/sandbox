@@ -24,7 +24,7 @@ alloy:
     - name: LOKI_REMOTE_WRITE_URL
       value: http://loki-gateway.loki.svc/loki/api/v1/push
     - name: OTEL_HTTP_EXPORTER_URL
-      value: http://tempo.tempo.svc:4318
+      value: http://tempo-gateway.tempo.svc
     - name: OTEL_MEMORY_LIMIT
       value: 500MiB
     - name: OTEL_SAMPLING_RATE

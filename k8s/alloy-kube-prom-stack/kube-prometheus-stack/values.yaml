@@ -41,7 +41,7 @@ grafana:
     - name: Tempo
       uid: tempo
       type: tempo
-      url: http://tempo.tempo.svc:3200
+      url: http://tempo-gateway.tempo.svc
       jsonData:
         serviceMap:
           datasourceUid: "prometheus"
