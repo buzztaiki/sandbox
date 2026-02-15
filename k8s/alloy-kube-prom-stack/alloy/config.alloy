@@ -30,6 +30,9 @@ prometheus.remote_write "default" {
     headers = {
       "X-Scope-OrgID" = sys.env("CLUSTER_NAME"),
     }
+    // NOTE: metric metadata を送信するには v2 request にする必要がある。metadata を送ると grafana で指標の説明を見ることができる。
+    // https://github.com/grafana/alloy/issues/5250
+    protobuf_message = "io.prometheus.write.v2.Request"
   }
   external_labels = {
     cluster = sys.env("CLUSTER_NAME"),
@@ -46,6 +49,8 @@ prometheus.operator.servicemonitors "default" {
   clustering {
     enabled = true
   }
+  // TODO 1.13 では利用不可
+  // honor_metadata = true
 }
 
 prometheus.operator.podmonitors "default" {
@@ -53,6 +58,8 @@ prometheus.operator.podmonitors "default" {
   clustering {
     enabled = true
   }
+  // TODO 1.13 では利用不可
+  // honor_metadata = true
 }
 
 prometheus.exporter.self "default" {}
@@ -60,6 +67,9 @@ prometheus.exporter.self "default" {}
 prometheus.scrape "self" {
   targets    = prometheus.exporter.self.default.targets
   forward_to = [prometheus.remote_write.default.receiver]
+  // NOTE: metric metadata を送信するにはこれを有効にする必要がある。なぜか、ここで有効にすると他の scrape でも metadata が有効になる
+  // https://github.com/grafana/alloy/issues/5250
+  honor_metadata = true
 }
 
 // ----------------
