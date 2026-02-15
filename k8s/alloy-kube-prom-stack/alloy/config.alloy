@@ -55,6 +55,13 @@ prometheus.operator.podmonitors "default" {
   }
 }
 
+prometheus.exporter.self "default" {}
+
+prometheus.scrape "self" {
+  targets    = prometheus.exporter.self.default.targets
+  forward_to = [prometheus.remote_write.default.receiver]
+}
+
 // ----------------
 // Log Forwarding
 // ----------------
