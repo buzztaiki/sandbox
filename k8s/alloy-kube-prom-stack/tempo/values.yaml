@@ -2,12 +2,23 @@ replicas: 2
 
 tempo:
   multitenancyEnabled: true
+  storage:
+    trace:
+      backend: s3
+      s3:
+        bucket: tempo-traces
+        endpoint: minio.minio.svc:9000
+        insecure: true
+        access_key: sandbox
+        secret_key: supersecret
+
   metricsGenerator:
     enabled: true
     storage:
       remote_write:
         - url: http://mimir-gateway.mimir.svc/api/v1/push
           send_exemplars: true
+
   overrides:
     defaults:
       metrics_generator:
@@ -15,15 +26,6 @@ tempo:
           - service-graphs
           - span-metrics
           - local-blocks
-  # storage:
-  #   trace:
-  #     backend: s3
-  #     s3:
-  #       access_key: "grafana-tempo"
-  #       secret_key: "supersecret"
-  #       bucket: "tempo-traces"
-  #       endpoint: "tempo-minio:9000"
-  #       insecure: true
 
 serviceMonitor:
   enabled: true

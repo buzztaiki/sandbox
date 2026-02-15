@@ -4,6 +4,8 @@ repositories:
     url: https://grafana.github.io/helm-charts
   - name: grafana-community
     url: https://grafana-community.github.io/helm-charts
+  - name: minio-official
+    url: https://charts.min.io
 
 releases:
   - name: kube-prometheus-stack
@@ -12,30 +14,59 @@ releases:
     namespace: kube-prometheus-stack
     values:
       - kube-prometheus-stack/values.yaml
+
   - name: alloy
     chart: grafana/alloy
     version: 1.6.0
     namespace: alloy
+    needs:
+      - kube-prometheus-stack/kube-prometheus-stack
+      - mimir/mimir
+      - loki/loki
+      - tempo/tempo
     values:
       - alloy/values.yaml.gotmpl
+
+  - name: minio
+    chart: minio-official/minio
+    version: 5.4.0
+    namespace: minio
+    values:
+      - minio/values.yaml
+
   - name: mimir
     chart: grafana/mimir-distributed
     version: 6.0.5
     namespace: mimir
+    needs:
+      - minio/minio
+      - kube-prometheus-stack/kube-prometheus-stack
     values:
       - mimir/values.yaml
+
   - name: loki
     chart: grafana/loki
     version: 6.53.0
     namespace: loki
+    needs:
+      - minio/minio
+      - kube-prometheus-stack/kube-prometheus-stack
     values:
       - loki/values.yaml
+
   - name: tempo
     chart: grafana-community/tempo
     version: 1.26.1
     namespace: tempo
+    needs:
+      - minio/minio
+      - mimir/mimir
+      - kube-prometheus-stack/kube-prometheus-stack
     values:
       - tempo/values.yaml
+
   - name: mythical
     chart: ./mythical
     namespace: mythical
+    needs:
+      - alloy/alloy

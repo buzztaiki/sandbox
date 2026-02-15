@@ -3,3 +3,24 @@ mimir:
     limits:
       # デフォルトの20では monitoring-mixin の rule は収まらない
       ruler_max_rules_per_rule_group: 30
+    alertmanager_storage:
+      backend: s3
+      s3: &s3
+        bucket_name: mimir-alertmanager
+        endpoint: minio.minio.svc:9000
+        insecure: true
+        access_key_id: sandbox
+        secret_access_key: supersecret
+    blocks_storage:
+      backend: s3
+      s3:
+        <<: *s3
+        bucket_name: mimir-tsdb
+    ruler_storage:
+      backend: s3
+      s3:
+        <<: *s3
+        bucket_name: mimir-ruler
+
+minio:
+  enabled: false
