@@ -31,8 +31,8 @@ releases:
     values:
       - loki/values.yaml
   - name: tempo
-    chart: grafana-community/tempo-distributed
-    version: 2.1.2
+    chart: grafana-community/tempo
+    version: 1.26.1
     namespace: tempo
     values:
       - tempo/values.yaml

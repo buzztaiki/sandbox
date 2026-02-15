@@ -49,7 +49,7 @@ loki.write "default" {
 
 otelcol.exporter.otlphttp "default" {
   client {
-    endpoint = "http://tempo-gateway.tempo.svc"
+    endpoint = "http://tempo.tempo.svc:4318"
     tls {
       insecure = true
     }
