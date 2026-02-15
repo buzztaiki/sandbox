@@ -3,6 +3,10 @@ logging {
   format = "logfmt"
 }
 
+livedebugging {
+  enabled = true
+}
+
 // ----------------
 // Discoveries
 // ----------------
