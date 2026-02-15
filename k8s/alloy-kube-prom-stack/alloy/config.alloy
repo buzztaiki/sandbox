@@ -130,7 +130,7 @@ loki.source.kubernetes_events "cluster_events" {
 }
 
 // ----------------
-// Open Telemetry Exporter and Receiver
+// Open Telemetry Exporters and Receivers
 // ----------------
 
 otelcol.exporter.otlphttp "default" {
@@ -140,6 +140,11 @@ otelcol.exporter.otlphttp "default" {
       "X-Scope-OrgID" = sys.env("CLUSTER_NAME"),
     }
   }
+  sending_queue {
+    // batch を有効にする
+    batch {}
+  }
+
 }
 
 otelcol.receiver.otlp "default" {
@@ -150,9 +155,7 @@ otelcol.receiver.otlp "default" {
     endpoint = "0.0.0.0:4318"
   }
   output {
-    metrics = [otelcol.processor.k8sattributes.default.input]
-    logs    = [otelcol.processor.k8sattributes.default.input]
-    traces  = [otelcol.processor.k8sattributes.default.input]
+    traces  = [otelcol.processor.memory_limiter.default.input]
   }
 }
 
@@ -160,20 +163,23 @@ otelcol.receiver.otlp "default" {
 // Open Telemetry Processors
 // ----------------
 
-otelcol.processor.transform "external_labels" {
-  // error_mode = "ignore"
-  trace_statements {
-    context = "resource"
-    statements = [
-      string.format(`set(resource.attributes["k8s.cluster.name"], %q)`, sys.env("CLUSTER_NAME")),
-    ]
-  }
+otelcol.processor.memory_limiter "default" {
+  check_interval = "1s"
+  limit = sys.env("OTEL_MEMORY_LIMIT")
+
   output {
-    metrics = [otelcol.exporter.otlphttp.default.input]
-    logs    = [otelcol.exporter.otlphttp.default.input]
-    traces  = [otelcol.exporter.otlphttp.default.input]
+    traces  = [otelcol.processor.probabilistic_sampler.default.input]
   }
 }
+
+otelcol.processor.probabilistic_sampler "default" {
+  sampling_percentage = sys.env("OTEL_SAMPLING_RATE")
+
+  output {
+    traces  = [otelcol.processor.k8sattributes.default.input]
+  }
+}
+
 
 otelcol.processor.k8sattributes "default" {
   extract {
@@ -192,16 +198,18 @@ otelcol.processor.k8sattributes "default" {
   }
 
   output {
-    metrics = [otelcol.processor.batch.default.input]
-    logs    = [otelcol.processor.batch.default.input]
-    traces  = [otelcol.processor.batch.default.input]
+    traces  = [otelcol.processor.transform.external_labels.input]
   }
 }
 
-otelcol.processor.batch "default" {
+otelcol.processor.transform "external_labels" {
+  trace_statements {
+    context = "resource"
+    statements = [
+      string.format(`set(resource.attributes["k8s.cluster.name"], %q)`, sys.env("CLUSTER_NAME")),
+    ]
+  }
   output {
-    metrics = [otelcol.processor.transform.external_labels.input]
-    logs    = [otelcol.processor.transform.external_labels.input]
-    traces  = [otelcol.processor.transform.external_labels.input]
+    traces  = [otelcol.exporter.otlphttp.default.input]
   }
 }
