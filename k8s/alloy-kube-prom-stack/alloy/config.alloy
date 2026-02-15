@@ -22,39 +22,36 @@ discovery.kubernetes "pods" {
 
 prometheus.remote_write "default" {
   endpoint {
-    url = "http://mimir-gateway.mimir.svc/api/v1/push"
+    url = sys.env("PROMETHEUS_REMOTE_WRITE_URL")
     headers = {
-      "X-Scope-OrgID" = "kind",
+      "X-Scope-OrgID" = sys.env("CLUSTER_NAME"),
     }
   }
   external_labels = {
-    cluster = "kind",
+    cluster = sys.env("CLUSTER_NAME"),
   }
 }
 
 mimir.rules.kubernetes "default" {
-  address = "http://mimir-gateway.mimir.svc"
-  tenant_id = "kind"
+  address = sys.env("MIMIR_RULER_URL")
+  tenant_id = sys.env("CLUSTER_NAME")
 }
 
 loki.write "default" {
   endpoint {
-    url = "http://loki-gateway.loki.svc/loki/api/v1/push"
-    tenant_id = "kind"
+    url = sys.env("LOKI_REMOTE_WRITE_URL")
+    tenant_id = sys.env("CLUSTER_NAME")
   }
   external_labels = {
-    cluster = "kind",
+    cluster = sys.env("CLUSTER_NAME"),
   }
 }
 
 otelcol.exporter.otlphttp "default" {
   client {
-    endpoint = "http://tempo.tempo.svc:4318"
-    tls {
-      insecure = true
-    }
+    endpoint = sys.env("OTEL_HTTP_EXPORTER_URL")
     headers = {
-      "X-Scope-OrgID" = "kind",
+      "X-Scope-OrgID" = sys.env("CLUSTER_NAME"),
     }
   }
 }
@@ -62,7 +59,9 @@ otelcol.processor.transform "external_labels" {
   // error_mode = "ignore"
   trace_statements {
     context = "resource"
-    statements = [`set(resource.attributes["k8s.cluster.name"], "kind")`]
+    statements = [
+      string.format(`set(resource.attributes["k8s.cluster.name"], %q)`, sys.env("CLUSTER_NAME")),
+    ]
   }
   output {
     metrics = [otelcol.exporter.otlphttp.default.input]

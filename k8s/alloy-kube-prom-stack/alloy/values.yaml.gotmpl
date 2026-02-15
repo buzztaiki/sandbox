@@ -10,6 +10,18 @@ alloy:
       port: 4318
       targetPort: 4318
       protocol: TCP
+  extraEnv:
+    - name: CLUSTER_NAME
+      value: kind
+    - name: PROMETHEUS_REMOTE_WRITE_URL
+      value: http://mimir-gateway.mimir.svc/api/v1/push
+    - name: MIMIR_RULER_URL
+      value: http://mimir-gateway.mimir.svc
+    - name: LOKI_REMOTE_WRITE_URL
+      value: http://loki-gateway.loki.svc/loki/api/v1/push
+    - name: OTEL_HTTP_EXPORTER_URL
+      value: http://tempo.tempo.svc:4318
+
   configMap:
     content: |
       {{- readFile "config.alloy" | nindent 6 }}
