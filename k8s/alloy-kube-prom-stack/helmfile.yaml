@@ -65,8 +65,21 @@ releases:
     values:
       - tempo/values.yaml
 
+  - name: beyla
+    chart: grafana/beyla
+    version: 1.11.0
+    namespace: beyla
+    needs:
+      - alloy/alloy
+    values:
+      - beyla/values.yaml
+
   - name: mythical
     chart: ./mythical
     namespace: mythical
     needs:
       - alloy/alloy
+
+  - name: httpbin
+    chart: ./httpbin
+    namespace: httpbin

@@ -1,0 +1,33 @@
+# TODO: https://github.com/grafana/beyla/tree/main/examples/greeting-apps をためす
+# TODO: k3s-bin
+# TODO: minikube
+# - docker
+# - libvirt
+# TODO: AKS でためす
+config:
+  data:
+    enforce_sys_caps: true
+    log_level: debug
+    trace_printer: text
+    otel_metrics_export:
+      endpoint: http://alloy.alloy.svc:4318
+    otel_traces_export:
+      endpoint: http://alloy.alloy.svc:4318
+    network:
+      enable: true
+    discovery:
+      instrument:
+        # # TODO: filtered spans from processes that did not match discovery になる
+        # - k8s_namespace: httpbin
+        - k8s_deployment_name: httpbin
+    routes:
+      unmatched: heuristic
+      # patterns:
+      #   - "*"
+      # ignored_patterns:
+      #   - "/metric*"
+      #   - "/health*"
+      #   - "*/health*"
+#
+# serviceMonitor:
+#   enabled: true
