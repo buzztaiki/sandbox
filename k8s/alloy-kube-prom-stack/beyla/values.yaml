@@ -1,14 +1,11 @@
-# TODO: https://github.com/grafana/beyla/tree/main/examples/greeting-apps をためす
-# TODO: k3s-bin
-# TODO: minikube
-# - docker
-# - libvirt
-# TODO: AKS でためす
+image:
+  # kernal 6.18 は 3.x じゃないと動かなかった
+  # see: https://gist.github.com/buzztaiki/a530a12d2f87e1e86ade42ef9cac1159
+  tag: 3.0.0-rc5
 config:
   data:
     enforce_sys_caps: true
-    log_level: debug
-    trace_printer: text
+    # trace_printer: text # 何を trace しているのか見たいときに有効にする
     otel_metrics_export:
       endpoint: http://alloy.alloy.svc:4318
     otel_traces_export:
@@ -17,17 +14,13 @@ config:
       enable: true
     discovery:
       instrument:
-        # # TODO: filtered spans from processes that did not match discovery になる
-        # - k8s_namespace: httpbin
-        - k8s_deployment_name: httpbin
+        - k8s_namespace: httpbin
+        - k8s_namespace: mimir
+        - k8s_namespace: loki
+        - k8s_namespace: tempo
     routes:
       unmatched: heuristic
-      # patterns:
-      #   - "*"
-      # ignored_patterns:
-      #   - "/metric*"
-      #   - "/health*"
-      #   - "*/health*"
-#
-# serviceMonitor:
-#   enabled: true
+      ignored_patterns:
+        - "*/metric*"
+        - "*/health*"
+        - "*/grpc.health*"
