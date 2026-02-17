@@ -6,6 +6,8 @@ repositories:
     url: https://grafana-community.github.io/helm-charts
   - name: minio-official
     url: https://charts.min.io
+  - name: traefik
+    url: https://traefik.github.io/charts
 
 releases:
   - name: kube-prometheus-stack
@@ -83,3 +85,10 @@ releases:
   - name: httpbin
     chart: ./httpbin
     namespace: httpbin
+
+  - name: traefik
+    chart: traefik/traefik
+    version: 39.0.1
+    set:
+      - name: service.type
+        value: ClusterIP
