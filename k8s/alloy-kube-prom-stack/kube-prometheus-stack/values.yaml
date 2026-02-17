@@ -5,6 +5,11 @@ alertmanager:
 grafana:
   adminUser: admin
   adminPassword: asdfjkl;
+  ingress:
+    enabled: true
+    hosts:
+      - grafana.k8s.internal
+
   sidecar:
     datasources:
       defaultDatasourceEnabled: false
@@ -20,6 +25,7 @@ grafana:
         httpHeaderName1: X-Scope-OrgID
       secureJsonData:
         httpHeaderValue1: kind
+
     - name: Alertmanager
       uid: alertmanager
       type: alertmanager
@@ -30,6 +36,7 @@ grafana:
         httpHeaderName1: X-Scope-OrgID
       secureJsonData:
         httpHeaderValue1: kind
+
     - name: Loki
       uid: loki
       type: loki
@@ -38,6 +45,7 @@ grafana:
         httpHeaderName1: X-Scope-OrgID
       secureJsonData:
         httpHeaderValue1: kind
+
     - name: Tempo
       uid: tempo
       type: tempo
