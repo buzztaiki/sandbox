@@ -1,0 +1,31 @@
+---
+repositories:
+  - name: traefik
+    url: https://traefik.github.io/charts
+
+helmDefaults:
+  diffArgs:
+    - --dry-run=server
+
+releases:
+  - name: traefik
+    chart: traefik/traefik
+    namespace: traefik
+    version: 39.0.1
+    set:
+      - name: service.type
+        value: NodePort
+      - name: ports.web.nodePort
+        value: 30000
+
+  - name: prometheus-operator-crds
+    chart: oci://ghcr.io/prometheus-community/charts/prometheus-operator-crds
+    version: 27.0.0
+    namespace: prometheus-operator
+
+  - name: prometheus-operator-admission-webhook
+    chart: oci://ghcr.io/prometheus-community/charts/prometheus-operator-admission-webhook
+    version: 0.36.2
+    namespace: prometheus-operator
+    needs:
+      - prometheus-operator/prometheus-operator-crds
