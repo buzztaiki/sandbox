@@ -33,6 +33,11 @@ https://grafana.com/docs/alloy/latest/
 
 ```mermaid
 graph LR
+    subgraph apps["アプリケーション"]
+        httpbin["httpbin"]
+        mythical["mythical"]
+    end
+
     subgraph kps["kube-prometheus-stack"]
         kube_monitors["ServiceMonitors / PodMonitors"]
         kube_rules["PrometheusRules"]
@@ -74,7 +79,7 @@ graph LR
     grafana r1@-.->|"PromQL"| mimir
     grafana r2@-.->|"Alertmanager"| mimir_am
     traefik i1@-->|"grafana.k8s.localhost"| grafana
-    traefik i2@-->|"minio.k8s.localhost"| minio
+    traefik i2@-->|"httpbin.k8s.localhost"| httpbin
 
     classDef metrics stroke:#f5a623
     classDef storage stroke:#95a5a6
@@ -124,8 +129,7 @@ graph LR
     loki s1@-->|"S3 (chunks / ruler)"| minio
     grafana r1@-.->|"LogQL"| loki
     traefik i1@-->|"grafana.k8s.localhost"| grafana
-    traefik i2@-->|"alloy.k8s.localhost"| alloy_otel
-    traefik i3@-->|"minio.k8s.localhost"| minio
+    traefik i2@-->|"httpbin.k8s.localhost"| httpbin
 
     classDef logs stroke:#27ae60
     classDef storage stroke:#95a5a6
@@ -135,7 +139,7 @@ graph LR
     class l1,l2,l3,l4 logs
     class s1 storage
     class r1 read
-    class i1,i2,i3 ingress
+    class i1,i2 ingress
 ```
 
 ### Traces
@@ -184,7 +188,7 @@ graph LR
     tempo s1@-->|"S3 (traces)"| minio
     grafana r1@-.->|"TraceQL"| tempo
     traefik i1@-->|"grafana.k8s.localhost"| grafana
-    traefik i2@-->|"alloy.k8s.localhost"| alloy_otel
+    traefik i2@-->|"httpbin.k8s.localhost"| httpbin
 
     classDef traces stroke:#9b59b6
     classDef metrics stroke:#f5a623
