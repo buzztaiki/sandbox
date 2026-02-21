@@ -1,9 +1,9 @@
 ingress:
   enabled: true
   hosts:
-    - alloy.k8s.internal
+    - alloy.k8s.localhost
   extraPaths:
-    - path: /alloy
+    - path: /
       pathType: Prefix
       backend:
         service:
@@ -14,7 +14,6 @@ ingress:
 alloy:
   ## NOTE: honor_metadata と protobuf_message が experimental
   stabilityLevel: experimental
-  uiPathPrefix: /alloy
   clustering:
     enabled: true
   mounts:

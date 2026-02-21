@@ -8,7 +8,7 @@ grafana:
   ingress:
     enabled: true
     hosts:
-      - grafana.k8s.internal
+      - grafana.k8s.localhost
 
   sidecar:
     datasources:

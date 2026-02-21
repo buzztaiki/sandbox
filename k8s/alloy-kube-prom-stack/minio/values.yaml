@@ -3,6 +3,11 @@ drivesPerNode: 2
 rootUser: sandbox
 rootPassword: supersecret
 
+consoleIngress:
+  enabled: true
+  hosts:
+    - minio.k8s.localhost
+
 buckets:
   - name: loki-chunks
     policy: none

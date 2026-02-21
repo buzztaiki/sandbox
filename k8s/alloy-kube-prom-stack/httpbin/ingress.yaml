@@ -4,7 +4,7 @@ metadata:
   name: httpbin
 spec:
   rules:
-    - host: httpbin.k8s.internal
+    - host: httpbin.k8s.localhost
       http:
         paths:
           - backend:

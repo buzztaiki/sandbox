@@ -4,6 +4,10 @@ networking:
   kubeProxyMode: "nftables"
 nodes:
   - role: control-plane
+    extraPortMappings:
+      - containerPort: 30000
+        hostPort: 8000
+        listenAddress: "127.0.0.1"
   - role: worker
   - role: worker
   - role: worker

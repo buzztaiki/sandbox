@@ -14,6 +14,16 @@ helmDefaults:
     - --dry-run=server
 
 releases:
+  - name: traefik
+    chart: traefik/traefik
+    namespace: traefik
+    version: 39.0.1
+    set:
+      - name: service.type
+        value: NodePort
+      - name: ports.web.nodePort
+        value: 30000
+
   - name: kube-prometheus-stack
     chart: oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack
     version: 81.5.0
@@ -89,10 +99,3 @@ releases:
   - name: httpbin
     chart: ./httpbin
     namespace: httpbin
-
-  - name: traefik
-    chart: traefik/traefik
-    version: 39.0.1
-    set:
-      - name: service.type
-        value: ClusterIP
