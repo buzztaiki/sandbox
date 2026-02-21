@@ -30,36 +30,28 @@ https://grafana.com/docs/alloy/latest/
 ## 構成図
 
 ```mermaid
-graph TB
-    subgraph ingress["Ingress"]
-        traefik["Traefik (NodePort:30000)"]
-    end
-
+graph LR
     subgraph apps["アプリケーション"]
         httpbin["httpbin"]
         mythical["mythical"]
     end
 
     subgraph observability["オブザーバビリティ基盤"]
-        subgraph alloy_ns["Alloy (DaemonSet + Clustering)"]
-            alloy_metrics["Metrics Collection\n(ServiceMonitors / PodMonitors / self)"]
-            alloy_logs["Log Collection\n(pod logs / k8s events)"]
-            alloy_otel["OTel Pipeline\n(receiver → processors → exporters)"]
-            alloy_rules["mimir.rules.kubernetes"]
+        subgraph kps["kube-prometheus-stack"]
+            kube_monitors["ServiceMonitors / PodMonitors"]
+            kube_rules["PrometheusRules"]
+            exporters["Node/KSM/etc Exporters"]
         end
 
         subgraph beyla_ns["Beyla"]
             beyla["Grafana Beyla (eBPF Auto-instrumentation)"]
         end
 
-        subgraph grafana_ns["Grafana (kube-prometheus-stack)"]
-            grafana["Grafana"]
-        end
-
-        subgraph kps["kube-prometheus-stack"]
-            kube_monitors["ServiceMonitors / PodMonitors"]
-            kube_rules["PrometheusRules"]
-            exporters["Node/KSM/etc Exporters"]
+        subgraph alloy_ns["Alloy (DaemonSet + Clustering)"]
+            alloy_metrics["Metrics Collection\n(ServiceMonitors / PodMonitors / self)"]
+            alloy_logs["Log Collection\n(pod logs / k8s events)"]
+            alloy_otel["OTel Pipeline\n(receiver → processors → exporters)"]
+            alloy_rules["mimir.rules.kubernetes"]
         end
 
         subgraph mimir_ns["Mimir"]
@@ -80,6 +72,14 @@ graph TB
         subgraph minio_ns["MinIO"]
             minio["MinIO (S3 backend)"]
         end
+
+        subgraph grafana_ns["Grafana (kube-prometheus-stack)"]
+            grafana["Grafana"]
+        end
+    end
+
+    subgraph ingress["Ingress"]
+        traefik["Traefik (NodePort:30000)"]
     end
 
     %% eBPF instrumentation
