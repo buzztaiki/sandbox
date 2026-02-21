@@ -80,14 +80,14 @@ graph TB
     end
 
     %% eBPF instrumentation
-    beyla t1@-->|"OTLP metrics+traces (:4318)"| alloy_otel
+    beyla t1@-->|"OTLP (:4318)"| alloy_otel
 
     %% App traces via OTel SDK
-    apps t2@-->|"OTLP gRPC/HTTP (:4317/:4318)"| alloy_otel
+    apps t2@-->|"OTLP (:4317/:4318)"| alloy_otel
 
     %% Alloy -> metrics
-    alloy_metrics m1@-->|"prometheus.remote_write (RW v2)"| mimir
-    alloy_rules m2@-->|"mimir.rules.kubernetes"| mimir_ruler
+    alloy_metrics m1@-->|"remote_write"| mimir
+    alloy_rules m2@-->|"rules sync"| mimir_ruler
 
     %% Alloy scrape via CRDs
     kube_monitors m3@-->|"ServiceMonitors / PodMonitors"| alloy_metrics
@@ -106,7 +106,7 @@ graph TB
     alloy_otel m6@-->|"OTLP metrics"| mimir
 
     %% Tempo MetricsGenerator -> Mimir
-    tempo_mg m5@-->|"prometheus.remote_write (span metrics)"| mimir
+    tempo_mg m5@-->|"remote_write (span metrics)"| mimir
 
     %% Storage backends
     mimir s1@-->|"S3 (tsdb / ruler / alertmanager)"| minio
