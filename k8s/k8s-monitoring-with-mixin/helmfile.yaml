@@ -1,5 +1,11 @@
 ---
 repositories:
+  - name: grafana
+    url: https://grafana.github.io/helm-charts
+  - name: grafana-community
+    url: https://grafana-community.github.io/helm-charts
+  - name: minio-official
+    url: https://charts.min.io
   - name: traefik
     url: https://traefik.github.io/charts
 
@@ -29,3 +35,41 @@ releases:
     namespace: prometheus-operator
     needs:
       - prometheus-operator/prometheus-operator-crds
+
+  - name: minio
+    chart: minio-official/minio
+    version: 5.4.0
+    namespace: minio
+    values:
+      - minio/values.yaml
+
+  - name: mimir
+    chart: grafana/mimir-distributed
+    version: 6.0.5
+    namespace: mimir
+    needs:
+      - minio/minio
+      - prometheus-operator/prometheus-operator-crds
+    values:
+      - mimir/values.yaml
+
+  - name: loki
+    chart: grafana/loki
+    version: 6.53.0
+    namespace: loki
+    needs:
+      - minio/minio
+      - prometheus-operator/prometheus-operator-crds
+    values:
+      - loki/values.yaml
+
+  - name: tempo
+    chart: grafana-community/tempo-distributed
+    version: 2.1.2
+    namespace: tempo
+    needs:
+      - minio/minio
+      - mimir/mimir
+      - prometheus-operator/prometheus-operator-crds
+    values:
+      - tempo/values.yaml
