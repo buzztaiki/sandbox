@@ -1,0 +1,49 @@
+multitenancyEnabled: true
+
+traces:
+  otlp:
+    grpc:
+      enabled: true
+    http:
+      enabled: true
+
+storage:
+  trace:
+    backend: s3
+    s3:
+      bucket: tempo-traces
+      endpoint: minio.minio.svc:9000
+      insecure: true
+      access_key: sandbox
+      secret_key: supersecret
+
+overrides:
+  defaults:
+    metrics_generator:
+      processors:
+        - service-graphs
+        - span-metrics
+        - local-blocks
+
+ingester:
+  config:
+    flush_all_on_shutdown: true
+    replication_factor: 1 # dev:1, prod:1 or 3
+
+metricsGenerator:
+  enabled: true
+  config:
+    storage:
+      remote_write:
+        - url: http://mimir-gateway.mimir.svc/api/v1/push
+          send_exemplars: true
+
+gateway:
+  enabled: true
+
+metaMonitoring:
+  serviceMonitor:
+    enabled: true
+
+minio:
+  enabled: false

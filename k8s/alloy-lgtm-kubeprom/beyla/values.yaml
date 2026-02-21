@@ -1,0 +1,26 @@
+image:
+  # kernal 6.18 は 3.x じゃないと動かなかった
+  # see: https://gist.github.com/buzztaiki/a530a12d2f87e1e86ade42ef9cac1159
+  tag: 3.0.0-rc5
+config:
+  data:
+    enforce_sys_caps: true
+    # trace_printer: text # 何を trace しているのか見たいときに有効にする
+    otel_metrics_export:
+      endpoint: http://alloy.alloy.svc:4318
+    otel_traces_export:
+      endpoint: http://alloy.alloy.svc:4318
+    network:
+      enable: true
+    discovery:
+      instrument:
+        - k8s_namespace: httpbin
+        - k8s_namespace: mimir
+        - k8s_namespace: loki
+        - k8s_namespace: tempo
+    routes:
+      unmatched: heuristic
+      ignored_patterns:
+        - "*/metric*"
+        - "*/health*"
+        - "*/grpc.health*"

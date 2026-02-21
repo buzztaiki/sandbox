@@ -1,0 +1,48 @@
+ingress:
+  enabled: true
+  hosts:
+    - alloy.k8s.localhost
+  extraPaths:
+    - path: /
+      pathType: Prefix
+      backend:
+        service:
+          name: alloy
+          port:
+            name: http-metrics
+
+alloy:
+  ## NOTE: honor_metadata と protobuf_message が experimental
+  stabilityLevel: experimental
+  clustering:
+    enabled: true
+  mounts:
+    varlog: true
+  extraPorts:
+    - name: otlp-grpc
+      port: 4317
+      targetPort: 4317
+      protocol: TCP
+    - name: otlp-http
+      port: 4318
+      targetPort: 4318
+      protocol: TCP
+  extraEnv:
+    - name: CLUSTER_NAME
+      value: kind
+    - name: PROMETHEUS_REMOTE_WRITE_URL
+      value: http://mimir-gateway.mimir.svc/api/v1/push
+    - name: MIMIR_RULER_URL
+      value: http://mimir-gateway.mimir.svc
+    - name: LOKI_REMOTE_WRITE_URL
+      value: http://loki-gateway.loki.svc/loki/api/v1/push
+    - name: OTEL_HTTP_EXPORTER_URL
+      value: http://tempo-gateway.tempo.svc
+    - name: OTEL_MEMORY_LIMIT
+      value: 500MiB
+    - name: OTEL_SAMPLING_RATE
+      value: "50"
+
+  configMap:
+    content: |
+      {{- readFile "config.alloy" | nindent 6 }}

@@ -3,3 +3,4 @@
 *.tfstate.*
 *.tfvars
 node_modules/
+.charts/

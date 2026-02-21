@@ -1,0 +1,58 @@
+prometheus:
+  enabled: false
+alertmanager:
+  enabled: false
+grafana:
+  adminUser: admin
+  adminPassword: asdfjkl;
+  ingress:
+    enabled: true
+    hosts:
+      - grafana.k8s.localhost
+
+  sidecar:
+    datasources:
+      defaultDatasourceEnabled: false
+  additionalDataSources:
+    - name: Prometheus
+      uid: prometheus
+      type: prometheus
+      url: http://mimir-gateway.mimir.svc/prometheus/
+      isDefault: true
+      jsonData:
+        prometheusType: Mimir
+        prometheusVersion: "2.9.1"
+        httpHeaderName1: X-Scope-OrgID
+      secureJsonData:
+        httpHeaderValue1: kind
+
+    - name: Alertmanager
+      uid: alertmanager
+      type: alertmanager
+      url: http://mimir-gateway.mimir.svc:8080/alertmanager/
+      jsonData:
+        handleGrafanaManagedAlerts: false
+        implementation: prometheus
+        httpHeaderName1: X-Scope-OrgID
+      secureJsonData:
+        httpHeaderValue1: kind
+
+    - name: Loki
+      uid: loki
+      type: loki
+      url: http://loki-gateway.loki.svc
+      jsonData:
+        httpHeaderName1: X-Scope-OrgID
+      secureJsonData:
+        httpHeaderValue1: kind
+
+    - name: Tempo
+      uid: tempo
+      type: tempo
+      url: http://tempo-gateway.tempo.svc
+      jsonData:
+        serviceMap:
+          datasourceUid: "prometheus"
+        httpHeaderName1: X-Scope-OrgID
+      secureJsonData:
+        httpHeaderValue1: kind
