@@ -130,9 +130,9 @@ graph LR
 
     classDef traces stroke:#9b59b6
     classDef metrics stroke:#f5a623
-    classDef logs stroke:#7ed321
+    classDef logs stroke:#27ae60
     classDef storage stroke:#95a5a6
-    classDef read stroke:#85c1e9
+    classDef read stroke:#c0392b
     classDef ingress stroke:#3498db
 
     class t1,t2,t3 traces
