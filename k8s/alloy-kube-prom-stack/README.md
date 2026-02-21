@@ -76,46 +76,60 @@ graph TB
     end
 
     %% eBPF instrumentation
-    beyla -->|"OTLP metrics+traces (:4318)"| alloy
+    beyla t1@-->|"OTLP metrics+traces (:4318)"| alloy
 
     %% App traces via OTel SDK
-    apps -->|"OTLP gRPC/HTTP (:4317/:4318)"| alloy
+    apps t2@-->|"OTLP gRPC/HTTP (:4317/:4318)"| alloy
 
     %% Alloy -> metrics
-    alloy -->|"prometheus.remote_write (RW v2)"| mimir
-    alloy -->|"mimir.rules.kubernetes"| mimir_ruler
+    alloy m1@-->|"prometheus.remote_write (RW v2)"| mimir
+    alloy m2@-->|"mimir.rules.kubernetes"| mimir_ruler
 
     %% Alloy scrape via CRDs
-    kube_sm -->|"ServiceMonitors / PodMonitors"| alloy
-    exporters -->|"scrape"| alloy
+    kube_sm m3@-->|"ServiceMonitors / PodMonitors"| alloy
+    exporters m4@-->|"scrape"| alloy
 
     %% Alloy -> logs
-    alloy -->|"pod logs (file tail)"| loki
-    alloy -->|"k8s events"| loki
-    alloy -->|"OTLP logs"| loki
+    alloy l1@-->|"pod logs (file tail)"| loki
+    alloy l2@-->|"k8s events"| loki
+    alloy l3@-->|"OTLP logs"| loki
 
     %% Alloy -> traces
-    alloy -->|"OTLP traces"| tempo
+    alloy t3@-->|"OTLP traces"| tempo
 
     %% Tempo MetricsGenerator -> Mimir
-    tempo_mg -->|"prometheus.remote_write (span metrics)"| mimir
+    tempo_mg m5@-->|"prometheus.remote_write (span metrics)"| mimir
 
     %% Storage backends
-    mimir -->|"S3 (tsdb / ruler / alertmanager)"| minio
-    loki  -->|"S3 (chunks / ruler)"| minio
-    tempo -->|"S3 (traces)"| minio
+    mimir s1@-->|"S3 (tsdb / ruler / alertmanager)"| minio
+    loki  s2@-->|"S3 (chunks / ruler)"| minio
+    tempo s3@-->|"S3 (traces)"| minio
 
     %% Grafana datasources
-    grafana -->|"PromQL"| mimir
-    grafana -->|"LogQL"| loki
-    grafana -->|"TraceQL"| tempo
-    grafana -->|"Alertmanager"| mimir_am
+    grafana r1@-->|"PromQL"| mimir
+    grafana r2@-->|"LogQL"| loki
+    grafana r3@-->|"TraceQL"| tempo
+    grafana r4@-->|"Alertmanager"| mimir_am
 
     %% Ingress
-    traefik -->|"grafana.k8s.localhost"| grafana
-    traefik -->|"alloy.k8s.localhost"| alloy
-    traefik -->|"minio.k8s.localhost"| minio
-    traefik -->|"httpbin.k8s.localhost"| httpbin
+    traefik i1@-->|"grafana.k8s.localhost"| grafana
+    traefik i2@-->|"alloy.k8s.localhost"| alloy
+    traefik i3@-->|"minio.k8s.localhost"| minio
+    traefik i4@-->|"httpbin.k8s.localhost"| httpbin
+
+    classDef traces stroke:#9b59b6
+    classDef metrics stroke:#f5a623
+    classDef logs stroke:#7ed321
+    classDef storage stroke:#95a5a6
+    classDef read stroke:#85c1e9
+    classDef ingress stroke:#3498db
+
+    class t1,t2,t3 traces
+    class m1,m2,m3,m4,m5 metrics
+    class l1,l2,l3 logs
+    class s1,s2,s3 storage
+    class r1,r2,r3,r4 read
+    class i1,i2,i3,i4 ingress
 ```
 
 ## TODO
