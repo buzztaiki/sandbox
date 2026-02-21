@@ -27,6 +27,97 @@ https://grafana.com/docs/alloy/latest/
 - [x] beyla
 
 
+## 構成図
+
+```mermaid
+graph TB
+    subgraph ingress["Ingress"]
+        traefik["Traefik\n(NodePort:30000)"]
+    end
+
+    subgraph apps["アプリケーション"]
+        httpbin["httpbin"]
+        mythical["mythical"]
+    end
+
+    subgraph observability["オブザーバビリティ基盤"]
+        subgraph alloy_ns["Alloy (DaemonSet + Clustering)"]
+            alloy["Grafana Alloy"]
+        end
+
+        subgraph beyla_ns["Beyla"]
+            beyla["Grafana Beyla\n(eBPF Auto-instrumentation)"]
+        end
+
+        subgraph kps["kube-prometheus-stack"]
+            grafana["Grafana"]
+            kube_sm["ServiceMonitors / PodMonitors / PrometheusRules"]
+            exporters["Node/KSM/etc Exporters"]
+        end
+
+        subgraph mimir_ns["Mimir"]
+            mimir["Mimir\n(metrics store)"]
+            mimir_am["Alertmanager"]
+            mimir_ruler["Ruler"]
+        end
+
+        subgraph loki_ns["Loki (SimpleScalable)"]
+            loki["Loki\n(log store)"]
+        end
+
+        subgraph tempo_ns["Tempo"]
+            tempo["Tempo\n(trace store)"]
+            tempo_mg["MetricsGenerator\n(span-metrics, service-graphs)"]
+        end
+
+        subgraph minio_ns["MinIO"]
+            minio["MinIO\n(S3 backend)"]
+        end
+    end
+
+    %% eBPF instrumentation
+    beyla -->|"OTLP metrics+traces\n:4318"| alloy
+
+    %% App traces via OTel SDK
+    apps -->|"OTLP gRPC/HTTP\n:4317/:4318"| alloy
+
+    %% Alloy -> metrics
+    alloy -->|"prometheus.remote_write\n(Prometheus RW v2)"| mimir
+    alloy -->|"mimir.rules.kubernetes\n(sync PrometheusRules)"| mimir_ruler
+
+    %% Alloy scrape via CRDs
+    kube_sm -->|"ServiceMonitors / PodMonitors"| alloy
+    exporters -->|"scrape"| alloy
+
+    %% Alloy -> logs
+    alloy -->|"pod logs\n(file tail)"| loki
+    alloy -->|"k8s events"| loki
+    alloy -->|"otelcol.exporter.loki\n(OTLP logs)"| loki
+
+    %% Alloy -> traces
+    alloy -->|"otelcol.exporter.otlphttp\n(OTLP traces)"| tempo
+
+    %% Tempo MetricsGenerator -> Mimir
+    tempo_mg -->|"prometheus.remote_write\n(span metrics)"| mimir
+
+    %% Storage backends
+    mimir -->|"S3 (tsdb / ruler / alertmanager)"| minio
+    loki  -->|"S3 (chunks / ruler)"| minio
+    tempo -->|"S3 (traces)"| minio
+
+    %% Grafana datasources
+    grafana -->|"PromQL"| mimir
+    grafana -->|"LogQL"| loki
+    grafana -->|"TraceQL"| tempo
+    grafana -->|"Alertmanager"| mimir_am
+
+    %% Ingress
+    traefik -->|"grafana.k8s.localhost"| grafana
+    traefik -->|"alloy.k8s.localhost"| alloy
+    traefik -->|"minio.k8s.localhost"| minio
+    traefik -->|"httpbin.k8s.localhost"| httpbin
+```
+
 ## TODO
 - readme
   - 構成図的なやつを claude に書かせる
