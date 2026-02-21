@@ -9,6 +9,10 @@ repositories:
   - name: traefik
     url: https://traefik.github.io/charts
 
+helmDefaults:
+  diffArgs:
+    - --dry-run=server
+
 releases:
   - name: kube-prometheus-stack
     chart: oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack
