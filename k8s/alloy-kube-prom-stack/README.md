@@ -32,7 +32,7 @@ https://grafana.com/docs/alloy/latest/
 ```mermaid
 graph TB
     subgraph ingress["Ingress"]
-        traefik["Traefik\n(NodePort:30000)"]
+        traefik["Traefik (NodePort:30000)"]
     end
 
     subgraph apps["アプリケーション"]
@@ -46,7 +46,7 @@ graph TB
         end
 
         subgraph beyla_ns["Beyla"]
-            beyla["Grafana Beyla\n(eBPF Auto-instrumentation)"]
+            beyla["Grafana Beyla (eBPF Auto-instrumentation)"]
         end
 
         subgraph kps["kube-prometheus-stack"]
@@ -56,49 +56,49 @@ graph TB
         end
 
         subgraph mimir_ns["Mimir"]
-            mimir["Mimir\n(metrics store)"]
+            mimir["Mimir (metrics store)"]
             mimir_am["Alertmanager"]
             mimir_ruler["Ruler"]
         end
 
         subgraph loki_ns["Loki (SimpleScalable)"]
-            loki["Loki\n(log store)"]
+            loki["Loki (log store)"]
         end
 
         subgraph tempo_ns["Tempo"]
-            tempo["Tempo\n(trace store)"]
-            tempo_mg["MetricsGenerator\n(span-metrics, service-graphs)"]
+            tempo["Tempo (trace store)"]
+            tempo_mg["MetricsGenerator (span-metrics, service-graphs)"]
         end
 
         subgraph minio_ns["MinIO"]
-            minio["MinIO\n(S3 backend)"]
+            minio["MinIO (S3 backend)"]
         end
     end
 
     %% eBPF instrumentation
-    beyla -->|"OTLP metrics+traces\n:4318"| alloy
+    beyla -->|"OTLP metrics+traces (:4318)"| alloy
 
     %% App traces via OTel SDK
-    apps -->|"OTLP gRPC/HTTP\n:4317/:4318"| alloy
+    apps -->|"OTLP gRPC/HTTP (:4317/:4318)"| alloy
 
     %% Alloy -> metrics
-    alloy -->|"prometheus.remote_write\n(Prometheus RW v2)"| mimir
-    alloy -->|"mimir.rules.kubernetes\n(sync PrometheusRules)"| mimir_ruler
+    alloy -->|"prometheus.remote_write (RW v2)"| mimir
+    alloy -->|"mimir.rules.kubernetes"| mimir_ruler
 
     %% Alloy scrape via CRDs
     kube_sm -->|"ServiceMonitors / PodMonitors"| alloy
     exporters -->|"scrape"| alloy
 
     %% Alloy -> logs
-    alloy -->|"pod logs\n(file tail)"| loki
+    alloy -->|"pod logs (file tail)"| loki
     alloy -->|"k8s events"| loki
-    alloy -->|"otelcol.exporter.loki\n(OTLP logs)"| loki
+    alloy -->|"OTLP logs"| loki
 
     %% Alloy -> traces
-    alloy -->|"otelcol.exporter.otlphttp\n(OTLP traces)"| tempo
+    alloy -->|"OTLP traces"| tempo
 
     %% Tempo MetricsGenerator -> Mimir
-    tempo_mg -->|"prometheus.remote_write\n(span metrics)"| mimir
+    tempo_mg -->|"prometheus.remote_write (span metrics)"| mimir
 
     %% Storage backends
     mimir -->|"S3 (tsdb / ruler / alertmanager)"| minio
