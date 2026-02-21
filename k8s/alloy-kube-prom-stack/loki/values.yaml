@@ -27,7 +27,7 @@ loki:
           period: 24h
 
   commonConfig:
-    replication_factor: 2
+    replication_factor: 1 # dev:1, prod:3
 
   ingester:
     chunk_encoding: snappy
