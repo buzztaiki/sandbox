@@ -33,15 +33,6 @@ https://grafana.com/docs/alloy/latest/
 
 ```mermaid
 graph LR
-    subgraph apps["アプリケーション"]
-        httpbin["httpbin"]
-        mythical["mythical"]
-    end
-
-    subgraph beyla_ns["Beyla"]
-        beyla["Grafana Beyla (eBPF Auto-instrumentation)"]
-    end
-
     subgraph kps["kube-prometheus-stack"]
         kube_monitors["ServiceMonitors / PodMonitors"]
         kube_rules["PrometheusRules"]
@@ -51,17 +42,12 @@ graph LR
     subgraph alloy_ns["Alloy (DaemonSet + Clustering)"]
         alloy_metrics["Metrics Collection"]
         alloy_rules["mimir.rules.kubernetes"]
-        alloy_otel["OTel Pipeline"]
     end
 
     subgraph mimir_ns["Mimir"]
         mimir["Mimir (metrics store)"]
         mimir_am["Alertmanager"]
         mimir_ruler["Ruler"]
-    end
-
-    subgraph tempo_ns["Tempo"]
-        tempo_mg["MetricsGenerator (span-metrics, service-graphs)"]
     end
 
     subgraph minio_ns["MinIO"]
@@ -76,34 +62,29 @@ graph LR
         traefik["Traefik (NodePort:30000)"]
     end
 
-    beyla m1@-->|"OTLP (:4318)"| alloy_otel
-    apps m2@-->|"OTLP (:4317/:4318)"| alloy_otel
-    alloy_metrics m3@-.->|"scrape"| kube_monitors
-    alloy_metrics m4@-.->|"scrape"| exporters
-    alloy_rules m5@-.->|"PrometheusRules"| kube_rules
-    alloy_metrics m6@-->|"remote_write"| mimir
-    alloy_rules m7@-->|"rules sync"| mimir_ruler
-    alloy_otel m8@-->|"OTLP metrics"| mimir
+    alloy_metrics m1@-.->|"scrape"| kube_monitors
+    alloy_metrics m2@-.->|"scrape"| exporters
+    alloy_rules m3@-.->|"PrometheusRules"| kube_rules
+    alloy_metrics m4@-->|"remote_write"| mimir
+    alloy_rules m5@-->|"rules sync"| mimir_ruler
     mimir_ruler x1@-.->|"query"| mimir
     mimir_ruler x2@-->|"recording rules"| mimir
     mimir_ruler x3@-->|"alerts"| mimir_am
-    tempo_mg m9@-->|"remote_write (span metrics)"| mimir
     mimir s1@-->|"S3 (tsdb / ruler / alertmanager)"| minio
     grafana r1@-.->|"PromQL"| mimir
     grafana r2@-.->|"Alertmanager"| mimir_am
     traefik i1@-->|"grafana.k8s.localhost"| grafana
-    traefik i2@-->|"alloy.k8s.localhost"| alloy_otel
-    traefik i3@-->|"minio.k8s.localhost"| minio
+    traefik i2@-->|"minio.k8s.localhost"| minio
 
     classDef metrics stroke:#f5a623
     classDef storage stroke:#95a5a6
     classDef read stroke:#c0392b
     classDef ingress stroke:#3498db
 
-    class m1,m2,m3,m4,m5,m6,m7,m8,m9,x1,x2,x3 metrics
+    class m1,m2,m3,m4,m5,x1,x2,x3 metrics
     class s1 storage
     class r1,r2 read
-    class i1,i2,i3 ingress
+    class i1,i2 ingress
 ```
 
 ### Logs
@@ -198,6 +179,7 @@ graph LR
     beyla t1@-->|"OTLP (:4318)"| alloy_otel
     apps t2@-->|"OTLP (:4317/:4318)"| alloy_otel
     alloy_otel t3@-->|"OTLP traces"| tempo
+    alloy_otel m2@-->|"OTLP metrics"| mimir
     tempo_mg m1@-->|"remote_write (span metrics)"| mimir
     tempo s1@-->|"S3 (traces)"| minio
     grafana r1@-.->|"TraceQL"| tempo
@@ -211,7 +193,7 @@ graph LR
     classDef ingress stroke:#3498db
 
     class t1,t2,t3 traces
-    class m1 metrics
+    class m1,m2 metrics
     class s1 storage
     class r1 read
     class i1,i2 ingress
