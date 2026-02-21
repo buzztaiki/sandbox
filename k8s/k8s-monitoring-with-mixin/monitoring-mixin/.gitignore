@@ -1,1 +1,2 @@
-/jsonnet_vendor/
+/jsonnet_libs/
+/generated/

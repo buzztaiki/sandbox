@@ -1,4 +1,20 @@
-jsonnet_vendor := "jsonnet_vendor"
+# MEMO
+# - https://www.amazinglyabstract.it/kubernetes/observability/2025/06/26/kubernetes-mixins.html
+
+set positional-arguments := true
+jsonnet_libs := "jsonnet_libs"
 
 install *args:
-    go tool jb install --jsonnetpkg-home={{jsonnet_vendor}}
+    go tool jb install --jsonnetpkg-home {{jsonnet_libs}} "$@"
+
+update *args:
+    go tool jb update --jsonnetpkg-home {{jsonnet_libs}} "$@"
+
+generate mixin:
+    mkdir -p generated/{{mixin}}/dashboards
+    go tool mixtool generate all \
+      --jpath {{jsonnet_libs}} \
+      --output-alerts generated/{{mixin}}/alerts.yaml \
+      --output-rules generated/{{mixin}}/rules.yaml \
+      --directory generated/{{mixin}}/dashboards/ \
+      {{mixin}}.libsonnet
