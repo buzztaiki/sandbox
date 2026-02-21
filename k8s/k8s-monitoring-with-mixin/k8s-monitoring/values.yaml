@@ -1,0 +1,28 @@
+cluster:
+  name: kind
+
+#
+# Destinations
+#
+destinations:
+  - name: metrics
+    type: prometheus
+    url: http://mimir-gateway.mimir.svc/api/v1/push
+    tenantId: kind
+
+#
+# Features
+#
+clusterMetrics:
+  enabled: true
+  windows-exporter:
+    enabled: false
+    deploy: false
+
+#
+# Collectors (Alloy instances)
+#
+alloy-metrics:
+  enabled: true
+  liveDebugging:
+    enabled: true

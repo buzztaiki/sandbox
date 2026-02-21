@@ -43,6 +43,15 @@ releases:
     values:
       - minio/values.yaml
 
+  - name: k8s-monitoring
+    chart: grafana/k8s-monitoring
+    version: 3.8.0
+    namespace: k8s-monitoring
+    needs:
+      - prometheus-operator/prometheus-operator-crds
+    values:
+      - k8s-monitoring/values.yaml
+
   - name: mimir
     chart: grafana/mimir-distributed
     version: 6.0.5
