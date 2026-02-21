@@ -1,4 +1,4 @@
-# alloy + kube-prom-stack
+# alloy + LGTM stack + kube-prom-stack
 
 https://grafana.com/docs/alloy/latest/
 
