@@ -1,0 +1,19 @@
+{{/* -*-mode: k8s-helm-*- */}}
+{{- $currentScope := . }}
+{{- range $path, $_ :=  .Files.Glob  "generated/*/dashboards/*.json" }}
+{{- with $currentScope }}
+{{- $mixin := dir $path | dir | base }}
+{{- $base := base $path | trimSuffix ".json" }}
+{{- $name := printf "%s-dashboard-%s" $mixin (trimSuffix ".json" $base) }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "monitoring-mixin.fullname" . }}-{{ $name }}
+  labels:
+    {{- include "monitoring-mixin.labels" . | nindent 4 }}
+data:
+  {{ $base }}: |
+    {{- .Files.Get $path | nindent 4}}
+{{- end }}
+{{- end }}
