@@ -26,6 +26,8 @@ clusterEvents:
   enabled: true
 nodeLogs:
   enabled: true
+podLogs:
+  enabled: true
 
 #
 # Collectors (Alloy instances)
