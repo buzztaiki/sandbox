@@ -9,6 +9,10 @@ destinations:
     type: prometheus
     url: http://mimir-gateway.mimir.svc/api/v1/push
     tenantId: kind
+  - name: logs
+    type: loki
+    url: http://loki-gateway.loki.svc/loki/api/v1/push
+    tenantId: kind
 
 #
 # Features
@@ -18,11 +22,17 @@ clusterMetrics:
   windows-exporter:
     enabled: false
     deploy: false
+clusterEvents:
+  enabled: true
 
 #
 # Collectors (Alloy instances)
 #
 alloy-metrics:
+  enabled: true
+  liveDebugging:
+    enabled: true
+alloy-singleton:
   enabled: true
   liveDebugging:
     enabled: true
