@@ -183,6 +183,7 @@ graph LR
     beyla t1@-->|"OTLP (:4318)"| alloy_otel
     apps t2@-->|"OTLP (:4317/:4318)"| alloy_otel
     alloy_otel t3@-->|"OTLP traces"| tempo
+    tempo t4@-->|"spans"| tempo_mg
     alloy_otel m2@-->|"OTLP metrics"| mimir
     tempo_mg m1@-->|"remote_write (span metrics)"| mimir
     tempo s1@-->|"S3 (traces)"| minio
@@ -196,7 +197,7 @@ graph LR
     classDef read stroke:#c0392b
     classDef ingress stroke:#3498db
 
-    class t1,t2,t3 traces
+    class t1,t2,t3,t4 traces
     class m1,m2 metrics
     class s1 storage
     class r1 read
