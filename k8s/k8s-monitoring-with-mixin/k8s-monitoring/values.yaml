@@ -28,6 +28,8 @@ nodeLogs:
   enabled: true
 podLogs:
   enabled: true
+prometheusOperatorObjects:
+  enabled: true
 
 #
 # Collectors (Alloy instances)
