@@ -42,7 +42,10 @@ graph TB
 
     subgraph observability["オブザーバビリティ基盤"]
         subgraph alloy_ns["Alloy (DaemonSet + Clustering)"]
-            alloy["Grafana Alloy"]
+            alloy_metrics["Metrics Collection\n(ServiceMonitors / PodMonitors / self)"]
+            alloy_logs["Log Collection\n(pod logs / k8s events)"]
+            alloy_otel["OTel Pipeline\n(receiver → processors → exporters)"]
+            alloy_rules["mimir.rules.kubernetes"]
         end
 
         subgraph beyla_ns["Beyla"]
@@ -76,26 +79,29 @@ graph TB
     end
 
     %% eBPF instrumentation
-    beyla t1@-->|"OTLP metrics+traces (:4318)"| alloy
+    beyla t1@-->|"OTLP metrics+traces (:4318)"| alloy_otel
 
     %% App traces via OTel SDK
-    apps t2@-->|"OTLP gRPC/HTTP (:4317/:4318)"| alloy
+    apps t2@-->|"OTLP gRPC/HTTP (:4317/:4318)"| alloy_otel
 
     %% Alloy -> metrics
-    alloy m1@-->|"prometheus.remote_write (RW v2)"| mimir
-    alloy m2@-->|"mimir.rules.kubernetes"| mimir_ruler
+    alloy_metrics m1@-->|"prometheus.remote_write (RW v2)"| mimir
+    alloy_rules m2@-->|"mimir.rules.kubernetes"| mimir_ruler
 
     %% Alloy scrape via CRDs
-    kube_sm m3@-->|"ServiceMonitors / PodMonitors"| alloy
-    exporters m4@-->|"scrape"| alloy
+    kube_sm m3@-->|"ServiceMonitors / PodMonitors"| alloy_metrics
+    exporters m4@-->|"scrape"| alloy_metrics
 
     %% Alloy -> logs
-    alloy l1@-->|"pod logs (file tail)"| loki
-    alloy l2@-->|"k8s events"| loki
-    alloy l3@-->|"OTLP logs"| loki
+    alloy_logs l1@-->|"pod logs (file tail)"| loki
+    alloy_logs l2@-->|"k8s events"| loki
+    alloy_otel l3@-->|"OTLP logs"| loki
 
     %% Alloy -> traces
-    alloy t3@-->|"OTLP traces"| tempo
+    alloy_otel t3@-->|"OTLP traces"| tempo
+
+    %% Alloy OTel -> metrics
+    alloy_otel m6@-->|"OTLP metrics"| mimir
 
     %% Tempo MetricsGenerator -> Mimir
     tempo_mg m5@-->|"prometheus.remote_write (span metrics)"| mimir
@@ -113,7 +119,7 @@ graph TB
 
     %% Ingress
     traefik i1@-->|"grafana.k8s.localhost"| grafana
-    traefik i2@-->|"alloy.k8s.localhost"| alloy
+    traefik i2@-->|"alloy.k8s.localhost"| alloy_otel
     traefik i3@-->|"minio.k8s.localhost"| minio
     traefik i4@-->|"httpbin.k8s.localhost"| httpbin
 
@@ -125,7 +131,7 @@ graph TB
     classDef ingress stroke:#3498db
 
     class t1,t2,t3 traces
-    class m1,m2,m3,m4,m5 metrics
+    class m1,m2,m3,m4,m5,m6 metrics
     class l1,l2,l3 logs
     class s1,s2,s3 storage
     class r1,r2,r3,r4 read
