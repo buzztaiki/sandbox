@@ -93,7 +93,7 @@ graph LR
     alloy_rules m2@-->|"rules sync"| mimir_ruler
 
     %% Alloy scrape via CRDs
-    kube_monitors m3@-->|"ServiceMonitors / PodMonitors"| alloy_metrics
+    kube_monitors m3@-->|"scrape"| alloy_metrics
     exporters m4@-->|"scrape"| alloy_metrics
     kube_rules m7@-->|"PrometheusRules"| alloy_rules
 
@@ -107,6 +107,11 @@ graph LR
 
     %% Alloy OTel -> metrics
     alloy_otel m6@-->|"OTLP metrics"| mimir
+
+    %% Mimir internal: Ruler <-> Mimir, Ruler -> Alertmanager
+    mimir x1@-->|"query"| mimir_ruler
+    mimir_ruler x2@-->|"recording rules"| mimir
+    mimir_ruler x3@-->|"alerts"| mimir_am
 
     %% Tempo MetricsGenerator -> Mimir
     tempo_mg m5@-->|"remote_write (span metrics)"| mimir
@@ -136,7 +141,7 @@ graph LR
     classDef ingress stroke:#3498db
 
     class t1,t2,t3 traces
-    class m1,m2,m3,m4,m5,m6,m7 metrics
+    class m1,m2,m3,m4,m5,m6,m7,x1,x2,x3 metrics
     class l1,l2,l3 logs
     class s1,s2,s3 storage
     class r1,r2,r3,r4 read
