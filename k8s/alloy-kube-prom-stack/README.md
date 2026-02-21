@@ -54,7 +54,8 @@ graph TB
 
         subgraph kps["kube-prometheus-stack"]
             grafana["Grafana"]
-            kube_sm["ServiceMonitors / PodMonitors / PrometheusRules"]
+            kube_monitors["ServiceMonitors / PodMonitors"]
+            kube_rules["PrometheusRules"]
             exporters["Node/KSM/etc Exporters"]
         end
 
@@ -89,8 +90,9 @@ graph TB
     alloy_rules m2@-->|"mimir.rules.kubernetes"| mimir_ruler
 
     %% Alloy scrape via CRDs
-    kube_sm m3@-->|"ServiceMonitors / PodMonitors"| alloy_metrics
+    kube_monitors m3@-->|"ServiceMonitors / PodMonitors"| alloy_metrics
     exporters m4@-->|"scrape"| alloy_metrics
+    kube_rules m7@-->|"PrometheusRules"| alloy_rules
 
     %% Alloy -> logs
     alloy_logs l1@-->|"pod logs (file tail)"| loki
@@ -131,7 +133,7 @@ graph TB
     classDef ingress stroke:#3498db
 
     class t1,t2,t3 traces
-    class m1,m2,m3,m4,m5,m6 metrics
+    class m1,m2,m3,m4,m5,m6,m7 metrics
     class l1,l2,l3 logs
     class s1,s2,s3 storage
     class r1,r2,r3,r4 read
