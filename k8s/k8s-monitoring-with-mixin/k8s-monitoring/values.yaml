@@ -24,6 +24,8 @@ clusterMetrics:
     deploy: false
 clusterEvents:
   enabled: true
+nodeLogs:
+  enabled: true
 
 #
 # Collectors (Alloy instances)
@@ -33,6 +35,10 @@ alloy-metrics:
   liveDebugging:
     enabled: true
 alloy-singleton:
+  enabled: true
+  liveDebugging:
+    enabled: true
+alloy-logs:
   enabled: true
   liveDebugging:
     enabled: true
