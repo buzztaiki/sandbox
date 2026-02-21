@@ -93,9 +93,9 @@ graph LR
     alloy_rules m2@-->|"rules sync"| mimir_ruler
 
     %% Alloy scrape via CRDs
-    kube_monitors m3@-->|"scrape"| alloy_metrics
-    exporters m4@-->|"scrape"| alloy_metrics
-    kube_rules m7@-->|"PrometheusRules"| alloy_rules
+    alloy_metrics m3@-.->|"scrape"| kube_monitors
+    alloy_metrics m4@-.->|"scrape"| exporters
+    alloy_rules m7@-.->|"PrometheusRules"| kube_rules
 
     %% Alloy -> logs
     alloy_logs l1@-->|"pod logs (file tail)"| loki
@@ -109,7 +109,7 @@ graph LR
     alloy_otel m6@-->|"OTLP metrics"| mimir
 
     %% Mimir internal: Ruler <-> Mimir, Ruler -> Alertmanager
-    mimir x1@-->|"query"| mimir_ruler
+    mimir_ruler x1@-.->|"query"| mimir
     mimir_ruler x2@-->|"recording rules"| mimir
     mimir_ruler x3@-->|"alerts"| mimir_am
 
@@ -122,10 +122,10 @@ graph LR
     tempo s3@-->|"S3 (traces)"| minio
 
     %% Grafana datasources
-    grafana r1@-->|"PromQL"| mimir
-    grafana r2@-->|"LogQL"| loki
-    grafana r3@-->|"TraceQL"| tempo
-    grafana r4@-->|"Alertmanager"| mimir_am
+    grafana r1@-.->|"PromQL"| mimir
+    grafana r2@-.->|"LogQL"| loki
+    grafana r3@-.->|"TraceQL"| tempo
+    grafana r4@-.->|"Alertmanager"| mimir_am
 
     %% Ingress
     traefik i1@-->|"grafana.k8s.localhost"| grafana
