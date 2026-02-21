@@ -1,5 +1,15 @@
 {
   "version": 1,
-  "dependencies": [],
+  "dependencies": [
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/kubernetes-monitoring/kubernetes-mixin.git",
+          "subdir": ""
+        }
+      },
+      "version": "version-1.4.2"
+    }
+  ],
   "legacyImports": true
 }

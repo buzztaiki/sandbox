@@ -1,0 +1,4 @@
+jsonnet_vendor := "jsonnet_vendor"
+
+install *args:
+    go tool jb install --jsonnetpkg-home={{jsonnet_vendor}}
