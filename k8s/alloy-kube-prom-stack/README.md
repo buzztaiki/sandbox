@@ -52,8 +52,11 @@ graph TB
             beyla["Grafana Beyla (eBPF Auto-instrumentation)"]
         end
 
-        subgraph kps["kube-prometheus-stack"]
+        subgraph grafana_ns["Grafana (kube-prometheus-stack)"]
             grafana["Grafana"]
+        end
+
+        subgraph kps["kube-prometheus-stack"]
             kube_monitors["ServiceMonitors / PodMonitors"]
             kube_rules["PrometheusRules"]
             exporters["Node/KSM/etc Exporters"]
