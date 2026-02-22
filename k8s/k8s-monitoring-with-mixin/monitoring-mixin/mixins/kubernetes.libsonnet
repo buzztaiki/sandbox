@@ -2,6 +2,10 @@ local kubernetes = import 'kubernetes-mixin/mixin.libsonnet';
 
 kubernetes {
   _config+:: {
+    grafanaK8s+: {
+      grafanaTimezone: 'browser',
+    },
+    showMultiCluster: true,
   },
   grafanaDashboards: {
     [x.key]: x.value
