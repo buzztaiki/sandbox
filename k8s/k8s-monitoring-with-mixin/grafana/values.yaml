@@ -7,6 +7,7 @@ ingress:
 sidecar:
   dashboards:
     enabled: true
+    searchNamespace: ALL
 
 datasources:
   datasources.yaml:
