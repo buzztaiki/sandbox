@@ -6,7 +6,7 @@ node {
     showMultiCluster: true,
   },
   grafanaDashboards: {
-    [x.key]: x.value
+    [x.key]: x.value { timezone: 'browser' }
     for x in std.objectKeysValues(super.grafanaDashboards)
     if !(std.startsWith(x.key, 'nodes-aix') || std.startsWith(x.key, 'nodes-darwin'))
   },

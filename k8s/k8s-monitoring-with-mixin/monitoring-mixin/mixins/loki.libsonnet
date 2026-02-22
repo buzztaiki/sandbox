@@ -22,4 +22,8 @@ loki {
       enabled: true,
     },
   },
+  grafanaDashboards+:: {
+    [filename]+: { timezone: 'browser' }
+    for filename in std.objectFields(super.grafanaDashboards)
+  },
 }
