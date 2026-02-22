@@ -10,11 +10,16 @@ install *args:
 update *args:
     go tool jb update --jsonnetpkg-home {{jsonnet_libs}} "$@"
 
-generate mixin:
-    mkdir -p generated/{{mixin}}/dashboards
-    go tool mixtool generate all \
-      --jpath {{jsonnet_libs}} \
-      --output-alerts generated/{{mixin}}/alerts.yaml \
-      --output-rules generated/{{mixin}}/rules.yaml \
-      --directory generated/{{mixin}}/dashboards/ \
-      {{mixin}}.libsonnet
+generate:
+    #!/bin/bash
+    rm -rf generated
+    for f in mixins/*.libsonnet; do
+      mixin=$(basename $f .libsonnet)
+      mkdir -p generated/$mixin/dashboards
+      go tool mixtool generate all \
+        --jpath {{jsonnet_libs}} \
+        --output-alerts generated/$mixin/alerts.yaml \
+        --output-rules generated/$mixin/rules.yaml \
+        --directory generated/$mixin/dashboards/ \
+        $f
+    done
