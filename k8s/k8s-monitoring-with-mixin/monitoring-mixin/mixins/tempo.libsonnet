@@ -1,6 +1,6 @@
 local tempo = import 'tempo-mixin/mixin.libsonnet';
 
-tempo + {
+tempo {
   _config+:: {
-  }
+  },
 }

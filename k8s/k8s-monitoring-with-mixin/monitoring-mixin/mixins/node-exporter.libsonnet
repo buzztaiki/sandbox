@@ -1,7 +1,7 @@
 local node = import 'node-mixin/mixin.libsonnet';
 
-node + {
+node {
   _config+:: {
-    nodeExporterSelector: 'job="node-exporter"'
-  }
+    nodeExporterSelector: 'job="node-exporter"',
+  },
 }

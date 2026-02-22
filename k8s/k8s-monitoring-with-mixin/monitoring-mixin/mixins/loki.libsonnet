@@ -1,6 +1,6 @@
 local loki = import 'loki-mixin/mixin.libsonnet';
 
-loki + {
+loki {
   _config+:: {
     promtail+: {
       enabled: false,

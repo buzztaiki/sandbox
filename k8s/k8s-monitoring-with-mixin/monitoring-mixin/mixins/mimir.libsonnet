@@ -1,6 +1,6 @@
 local mimir = import 'mimir-mixin/mixin.libsonnet';
 
-mimir + {
+mimir {
   _config+:: {
-  }
+  },
 }
