@@ -17,6 +17,6 @@ metadata:
     {{ .Values.dashboard.markerLabel }}: {{ toYaml .Values.dashboard.markerLabelValue }}
 data:
   {{ base $path }}: |
-    {{- .Files.Get $path | nindent 4}}
+    {{- .Files.Get $path | fromJson | toJson | nindent 4 }}
 {{- end }}
 {{- end }}
