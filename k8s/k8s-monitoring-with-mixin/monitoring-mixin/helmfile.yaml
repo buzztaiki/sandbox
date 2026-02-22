@@ -1,0 +1,21 @@
+releases:
+  - name: kubernetes-mixin
+    chart: ./chart
+    namespace: monitoring-mixin
+    set: [{ name: mixinName, value: kubernetes }]
+  - name: node-exporter-mixin
+    chart: ./chart
+    namespace: monitoring-mixin
+    set: [{ name: mixinName, value: node-exporter }]
+  - name: loki-mixin
+    chart: ./chart
+    namespace: monitoring-mixin
+    set: [{ name: mixinName, value: loki }]
+  - name: mimir-mixin
+    chart: ./chart
+    namespace: monitoring-mixin
+    set: [{ name: mixinName, value: mimir }]
+  - name: tempo-mixin
+    chart: ./chart
+    namespace: monitoring-mixin
+    set: [{ name: mixinName, value: tempo }]

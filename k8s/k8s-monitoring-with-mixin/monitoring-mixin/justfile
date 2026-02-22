@@ -12,14 +12,15 @@ update *args:
 
 generate:
     #!/bin/bash -e
-    rm -rf generated
+    generated=chart/generated
+    rm -rf $generated
     for f in mixins/*.libsonnet; do
       mixin=$(basename $f .libsonnet)
-      mkdir -p generated/$mixin/dashboards
+      mkdir -p $generated/$mixin/dashboards
       go tool mixtool generate all \
         --jpath {{jsonnet_libs}} \
-        --output-alerts generated/$mixin/alerts.yaml \
-        --output-rules generated/$mixin/rules.yaml \
-        --directory generated/$mixin/dashboards/ \
+        --output-alerts $generated/$mixin/alerts.yaml \
+        --output-rules $generated/$mixin/rules.yaml \
+        --directory $generated/$mixin/dashboards/ \
         $f
     done
