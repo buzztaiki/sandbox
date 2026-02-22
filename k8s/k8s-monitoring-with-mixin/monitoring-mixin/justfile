@@ -1,26 +1,28 @@
-# MEMO
-# - https://www.amazinglyabstract.it/kubernetes/observability/2025/06/26/kubernetes-mixins.html
-
-set positional-arguments := true
+set quiet
 jsonnet_libs := "jsonnet_libs"
 
 install *args:
-    go tool jb install --jsonnetpkg-home {{jsonnet_libs}} "$@"
+    go tool jb install --jsonnetpkg-home {{jsonnet_libs}} {{args}}
 
 update *args:
-    go tool jb update --jsonnetpkg-home {{jsonnet_libs}} "$@"
+    go tool jb update --jsonnetpkg-home {{jsonnet_libs}} {{args}}
 
-generate:
+generate: install
     #!/bin/bash -e
     generated=chart/generated
     rm -rf $generated
     for f in mixins/*.libsonnet; do
       mixin=$(basename $f .libsonnet)
       mkdir -p $generated/$mixin/dashboards
-      go tool mixtool generate all \
-        --jpath {{jsonnet_libs}} \
-        --output-alerts $generated/$mixin/alerts.yaml \
-        --output-rules $generated/$mixin/rules.yaml \
-        --directory $generated/$mixin/dashboards/ \
-        $f
+
+      just render_alerts $mixin | yq -P > $generated/$mixin/alerts.yaml
+      just render_rules $mixin | yq -P > $generated/$mixin/rules.yaml
+      just render_dashboards $mixin --multi $generated/$mixin/dashboards >/dev/null
     done
+
+render_alerts mixin *args:
+    go tool jsonnet -J {{jsonnet_libs}} {{args}} -e '(import "mixins/{{mixin}}.libsonnet").prometheusAlerts'
+render_rules mixin *args:
+    go tool jsonnet -J {{jsonnet_libs}} {{args}} -e '(import "mixins/{{mixin}}.libsonnet").prometheusRules'
+render_dashboards mixin *args:
+    go tool jsonnet -J {{jsonnet_libs}} {{args}} -e '(import "mixins/{{mixin}}.libsonnet").grafanaDashboards'
