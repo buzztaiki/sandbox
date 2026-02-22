@@ -3,8 +3,7 @@
 {{- range $path, $_ :=  .Files.Glob  "generated/*/dashboards/*.json" }}
 {{- with $currentScope }}
 {{- $mixin := dir $path | dir | base }}
-{{- $base := base $path | trimSuffix ".json" }}
-{{- $name := printf "%s-dashboard-%s" $mixin (trimSuffix ".json" $base) }}
+{{- $name := printf "%s-dashboard-%s" $mixin (trimSuffix ".json" (base $path)) }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -17,7 +16,7 @@ metadata:
     {{- with .Values.dashboard.labels }}{{- toYaml . | nindent 4 }}{{- end }}
     {{ .Values.dashboard.markerLabel }}: {{ toYaml .Values.dashboard.markerLabelValue }}
 data:
-  {{ $base }}: |
+  {{ base $path }}: |
     {{- .Files.Get $path | nindent 4}}
 {{- end }}
 {{- end }}
