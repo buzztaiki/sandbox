@@ -98,8 +98,5 @@ releases:
     values:
       - grafana/values.yaml
 
-  - name: monitoring-mixin
-    chart: ./monitoring-mixin
-    namespace: monitoring-mixin
-    needs:
-      - prometheus-operator/prometheus-operator-crds
+helmfiles:
+  - path: monitoring-mixin
