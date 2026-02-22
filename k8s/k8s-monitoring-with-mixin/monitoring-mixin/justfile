@@ -1,5 +1,6 @@
 set quiet
 jsonnet_libs := "jsonnet_libs"
+lib := "lib"
 
 install *args:
     go tool jb install --jsonnetpkg-home {{jsonnet_libs}} {{args}}
@@ -21,8 +22,8 @@ generate: install
     done
 
 render_alerts mixin *args:
-    go tool jsonnet -J {{jsonnet_libs}} {{args}} -e '(import "mixins/{{mixin}}.libsonnet").prometheusAlerts'
+    go tool jsonnet -J {{jsonnet_libs}} -J {{lib}} {{args}} -e '(import "mixins/{{mixin}}.libsonnet").prometheusAlerts'
 render_rules mixin *args:
-    go tool jsonnet -J {{jsonnet_libs}} {{args}} -e '(import "mixins/{{mixin}}.libsonnet").prometheusRules'
+    go tool jsonnet -J {{jsonnet_libs}} -J {{lib}} {{args}} -e '(import "mixins/{{mixin}}.libsonnet").prometheusRules'
 render_dashboards mixin *args:
-    go tool jsonnet -J {{jsonnet_libs}} {{args}} -e '(import "mixins/{{mixin}}.libsonnet").grafanaDashboards'
+    go tool jsonnet -J {{jsonnet_libs}} -J {{lib}} {{args}} -e '(import "mixins/{{mixin}}.libsonnet").grafanaDashboards'

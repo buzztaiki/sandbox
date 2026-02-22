@@ -1,10 +1,8 @@
 local mimir = import 'mimir-mixin/mixin.libsonnet';
+local utils = import 'utils.libsonnet';
 
 mimir {
   _config+:: {
   },
-  grafanaDashboards+:: {
-    [filename]+: { timezone: 'browser' }
-    for filename in std.objectFields(super.grafanaDashboards)
-  },
+  grafanaDashboards+:: utils.withBrowserTimezone(super.grafanaDashboards),
 }

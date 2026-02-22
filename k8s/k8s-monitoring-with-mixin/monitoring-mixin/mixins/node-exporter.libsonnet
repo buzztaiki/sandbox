@@ -1,13 +1,14 @@
 local node = import 'node-mixin/mixin.libsonnet';
+local utils = import 'utils.libsonnet';
 
 node {
   _config+:: {
     nodeExporterSelector: 'job="node-exporter"',
     showMultiCluster: true,
   },
-  grafanaDashboards: {
-    [x.key]: x.value { timezone: 'browser' }
+  grafanaDashboards: utils.withBrowserTimezone({
+    [x.key]: x.value
     for x in std.objectKeysValues(super.grafanaDashboards)
     if !(std.startsWith(x.key, 'nodes-aix') || std.startsWith(x.key, 'nodes-darwin'))
-  },
+  }),
 }

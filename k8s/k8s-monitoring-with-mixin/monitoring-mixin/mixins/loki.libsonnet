@@ -1,4 +1,5 @@
 local loki = import 'loki-mixin/mixin.libsonnet';
+local utils = import 'utils.libsonnet';
 
 loki {
   _config+:: {
@@ -22,8 +23,5 @@ loki {
       enabled: true,
     },
   },
-  grafanaDashboards+:: {
-    [filename]+: { timezone: 'browser' }
-    for filename in std.objectFields(super.grafanaDashboards)
-  },
+  grafanaDashboards+:: utils.withBrowserTimezone(super.grafanaDashboards),
 }
