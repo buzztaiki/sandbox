@@ -22,6 +22,24 @@ clusterMetrics:
   windows-exporter:
     enabled: false
     deploy: false
+  cadvisor:
+    jobLabel: cadvisor
+  kubelet:
+    jobLabel: kubelet
+  kube-state-metrics:
+    jobLabel: kube-state-metrics
+  kubeScheduler:
+    jobLabel: kube-scheduler
+  kubeControllerManager:
+    jobLabel: kube-controller-manager
+  apiServer:
+    jobLabel: kube-apiserver
+  kubeProxy:
+    jobLabel: kube-proxy
+  node-exporter:
+    jobLabel: node-exporter
+    metricsTuning:
+      includeMetrics: [node_uname_info]
 clusterEvents:
   enabled: true
 nodeLogs:
