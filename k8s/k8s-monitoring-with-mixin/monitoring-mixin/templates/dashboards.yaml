@@ -10,8 +10,12 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ include "monitoring-mixin.fullname" . }}-{{ $name }}
+  annotations:
+    {{- with .Values.dashboard.annotations }}{{- toYaml . | nindent 4 }}{{- end }}
   labels:
     {{- include "monitoring-mixin.labels" . | nindent 4 }}
+    {{- with .Values.dashboard.labels }}{{- toYaml . | nindent 4 }}{{- end }}
+    {{ .Values.dashboard.markerLabel }}: {{ toYaml .Values.dashboard.markerLabelValue }}
 data:
   {{ $base }}: |
     {{- .Files.Get $path | nindent 4}}

@@ -49,14 +49,3 @@ Selector labels
 app.kubernetes.io/name: {{ include "monitoring-mixin.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
-
-{{/*
-Create the name of the service account to use
-*/}}
-{{- define "monitoring-mixin.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "monitoring-mixin.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
-{{- end }}
