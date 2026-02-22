@@ -38,6 +38,11 @@ alloy-metrics:
   enabled: true
   liveDebugging:
     enabled: true
+  extraConfig: |-
+    mimir.rules.kubernetes "default" {
+      address = "http://mimir-gateway.mimir.svc:8080"
+      tenant_id = convert.nonsensitive(remote.kubernetes.secret.metrics.data["tenantId"])
+    }
 alloy-singleton:
   enabled: true
   liveDebugging:
