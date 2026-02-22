@@ -1,13 +1,9 @@
-{{/* -*-mode: k8s-helm-*- */}}
-{{- $currentScope := . }}
-{{- range $path, $_ :=  .Files.Glob  "generated/*/alerts.yaml" }}
-{{- with $currentScope }}
-{{- $name := dir $path | base | printf "%s-alert" }}
+{{- $path :=  printf "generated/%s/alerts.yaml" .Values.mixinName }}
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: {{ include "monitoring-mixin.fullname" . }}-{{ $name }}
+  name: {{ include "monitoring-mixin.fullname" . }}-alert
   annotations:
     {{- with .Values.alert.annotations }}{{- toYaml . | nindent 4 }}{{- end }}
   labels:
@@ -15,5 +11,3 @@ metadata:
     {{- with .Values.alert.labels }}{{- toYaml . | nindent 4 }}{{- end }}
 spec:
   {{- .Files.Get $path | nindent 2 }}
-{{- end }}
-{{- end }}

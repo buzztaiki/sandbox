@@ -1,9 +1,7 @@
-{{/* -*-mode: k8s-helm-*- */}}
 {{- $currentScope := . }}
-{{- range $path, $_ :=  .Files.Glob  "generated/*/dashboards/*.json" }}
+{{- range $path, $_ :=  .Files.Glob  (printf "generated/%s/dashboards/*.json" .Values.mixinName) }}
 {{- with $currentScope }}
-{{- $mixin := dir $path | dir | base }}
-{{- $name := printf "%s-dashboard-%s" $mixin (trimSuffix ".json" (base $path)) }}
+{{- $name := printf "dashboard-%s" (trimSuffix ".json" (base $path)) }}
 ---
 apiVersion: v1
 kind: ConfigMap
