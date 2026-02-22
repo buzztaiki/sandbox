@@ -9,6 +9,15 @@
         }
       },
       "version": "version-1.4.2"
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/prometheus/node_exporter.git",
+          "subdir": "docs/node-mixin"
+        }
+      },
+      "version": "v1.10.2"
     }
   ],
   "legacyImports": true

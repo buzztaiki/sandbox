@@ -50,6 +50,16 @@
       },
       "version": "85d3cda160851f78d4cbf5a9766ba7973eeebe30",
       "sum": "0B4zE4mLHUN+6nWZo1c51S4lmhELbqAaSowEjadcg7A="
+    },
+    {
+      "source": {
+        "git": {
+          "remote": "https://github.com/prometheus/node_exporter.git",
+          "subdir": "docs/node-mixin"
+        }
+      },
+      "version": "457f93dd02a366ebb4ae9e09a0797fc97094e468",
+      "sum": "t5lGWjS4xUmXbOaMg8BddbJrIJeglTIi8HkT3UBWtP4="
     }
   ],
   "legacyImports": false
