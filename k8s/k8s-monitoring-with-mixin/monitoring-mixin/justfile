@@ -15,7 +15,7 @@ generate: install
       just generate_mixin $mixin
     done
 
-generate_mixin mixin: install
+generate_mixin mixin:
     #!/bin/bash -e
     generated=chart/generated/{{mixin}}
     rm -rf $generated &&mkdir -p $generated/dashboards
