@@ -14,12 +14,16 @@ generate: install
     rm -rf $generated
     for f in mixins/*.libsonnet; do
       mixin=$(basename $f .libsonnet)
-      mkdir -p $generated/$mixin/dashboards
-
-      just render_alerts $mixin | yq -P > $generated/$mixin/alerts.yaml
-      just render_rules $mixin | yq -P > $generated/$mixin/rules.yaml
-      just render_dashboards $mixin --multi $generated/$mixin/dashboards >/dev/null
+      just generate_mixin $mixin
     done
+
+generate_mixin mixin: install
+    #!/bin/bash -e
+    generated=chart/generated
+    mkdir -p $generated/{{mixin}}/dashboards
+    just render_alerts {{mixin}} | yq -P > $generated/{{mixin}}/alerts.yaml
+    just render_rules {{mixin}} | yq -P > $generated/{{mixin}}/rules.yaml
+    just render_dashboards {{mixin}} --multi $generated/{{mixin}}/dashboards >/dev/null
 
 render_alerts mixin *args:
     go tool jsonnet -J {{jsonnet_libs}} -J {{lib}} {{args}} -e '(import "mixins/{{mixin}}.libsonnet").prometheusAlerts'

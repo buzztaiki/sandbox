@@ -14,4 +14,9 @@ releases:
     chart: ./chart
     namespace: monitoring-mixin
     set: [{ name: mixinName, value: "{{ $name }}" }]
+    hooks:
+      - events: ["prepare"]
+        showlogs: true
+        command: "just"
+        args: ["generate_mixin", "{{ $name }}"]
   #{{- end }}
