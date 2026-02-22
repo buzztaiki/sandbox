@@ -11,7 +11,7 @@ update *args:
     go tool jb update --jsonnetpkg-home {{jsonnet_libs}} "$@"
 
 generate:
-    #!/bin/bash
+    #!/bin/bash -e
     rm -rf generated
     for f in mixins/*.libsonnet; do
       mixin=$(basename $f .libsonnet)
