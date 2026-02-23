@@ -19,7 +19,7 @@ alloy-metrics:
     extraConfig: |
       mimir.rules.kubernetes "default" {
         address   = sys.env("MIMIR_URL")
-        tenant_id = convert.nonsensitive(remote.kubernetes.secret.metrics.data["tenantId"])
+        tenant_id = sys.env("TENANT_ID")
       }
 alloy-singleton:
   enabled: true
@@ -37,11 +37,11 @@ destinations:
   - name: metrics
     type: prometheus
     urlFrom: sys.env("PROMETHEUS_DESTINATION_URL")
-    tenantId: kind
+    tenantIdFrom: sys.env("TENANT_ID")
   - name: logs
     type: loki
     urlFrom: sys.env("LOKI_DESTINATION_URL")
-    tenantId: kind
+    tenantIdFrom: sys.env("TENANT_ID")
 
 #
 # Features
