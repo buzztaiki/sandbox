@@ -1,0 +1,21 @@
+environments:
+  default:
+    values:
+      - mixinNames:
+          - kubernetes
+          - node-exporter
+          - loki
+          - mimir
+          - tempo
+---
+releases:
+  #{{- range $_, $name := .Values.mixinNames }}
+  - name: "{{ $name }}-mixin"
+    chart: ./chart
+    namespace: monitoring-mixin
+    set: [{ name: mixinName, value: "{{ $name }}" }]
+    hooks:
+      - events: ["prepare"]
+        command: "just"
+        args: ["generate_mixin", "{{ $name }}"]
+  #{{- end }}

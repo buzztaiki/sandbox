@@ -1,0 +1,102 @@
+---
+repositories:
+  - name: grafana
+    url: https://grafana.github.io/helm-charts
+  - name: grafana-community
+    url: https://grafana-community.github.io/helm-charts
+  - name: minio-official
+    url: https://charts.min.io
+  - name: traefik
+    url: https://traefik.github.io/charts
+
+helmDefaults:
+  diffArgs:
+    - --dry-run=server
+
+releases:
+  - name: traefik
+    chart: traefik/traefik
+    namespace: traefik
+    version: 39.0.1
+    set:
+      - name: service.type
+        value: NodePort
+      - name: ports.web.nodePort
+        value: 30000
+
+  - name: prometheus-operator-crds
+    chart: oci://ghcr.io/prometheus-community/charts/prometheus-operator-crds
+    version: 27.0.0
+    namespace: prometheus-operator
+
+  - name: prometheus-operator-admission-webhook
+    chart: oci://ghcr.io/prometheus-community/charts/prometheus-operator-admission-webhook
+    version: 0.36.2
+    namespace: prometheus-operator
+    needs:
+      - prometheus-operator/prometheus-operator-crds
+
+  - name: minio
+    chart: minio-official/minio
+    version: 5.4.0
+    namespace: minio
+    values:
+      - minio-values.yaml
+
+  - name: mimir
+    chart: grafana/mimir-distributed
+    version: 6.0.5
+    namespace: mimir
+    needs:
+      - minio/minio
+      - prometheus-operator/prometheus-operator-crds
+    values:
+      - mimir-values.yaml
+
+  - name: loki
+    chart: grafana/loki
+    version: 6.53.0
+    namespace: loki
+    needs:
+      - minio/minio
+      - prometheus-operator/prometheus-operator-crds
+    values:
+      - loki-values.yaml
+
+  - name: tempo
+    chart: grafana-community/tempo-distributed
+    version: 2.1.2
+    namespace: tempo
+    needs:
+      - minio/minio
+      - mimir/mimir
+      - prometheus-operator/prometheus-operator-crds
+    values:
+      - tempo-values.yaml
+
+  - name: k8s-monitoring
+    chart: grafana/k8s-monitoring
+    version: 3.8.0
+    namespace: k8s-monitoring
+    needs:
+      - mimir/mimir
+      - loki/loki
+      - tempo/tempo
+      - prometheus-operator/prometheus-operator-crds
+    values:
+      - k8s-monitoring-values.yaml
+
+  - name: grafana
+    chart: grafana-community/grafana
+    version: 11.1.7
+    namespace: grafana
+    needs:
+      - mimir/mimir
+      - loki/loki
+      - tempo/tempo
+      - prometheus-operator/prometheus-operator-crds
+    values:
+      - grafana-values.yaml
+
+helmfiles:
+  - path: monitoring-mixin

@@ -1,0 +1,23 @@
+# Default values for monitoring-mixin.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+mixinName: ""
+useReleaseNameAsFullName: true
+
+nameOverride: ""
+fullnameOverride: ""
+
+rule:
+  labels: {}
+  annotations: {}
+
+alert:
+  labels: {}
+  annotations: {}
+
+dashboard:
+  labels: {}
+  annotations: {}
+  markerLabel: grafana_dashboard
+  markerLabelValue: "1"

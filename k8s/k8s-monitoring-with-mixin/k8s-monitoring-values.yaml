@@ -1,0 +1,81 @@
+cluster:
+  name: kind
+
+#
+# Collectors (Alloy instances)
+#
+alloy-metrics:
+  enabled: true
+  alloy:
+    extraEnv: &extra-env
+      - name: PROMETHEUS_DESTINATION_URL
+        value: http://mimir-gateway.mimir.svc/api/v1/push
+      - name: LOKI_DESTINATION_URL
+        value: http://loki-gateway.loki.svc/loki/api/v1/push
+      - name: MIMIR_URL
+        value: http://mimir-gateway.mimir.svc:8080
+      - name: TENANT_ID
+        value: kind
+    extraConfig: |
+      mimir.rules.kubernetes "default" {
+        address   = sys.env("MIMIR_URL")
+        tenant_id = sys.env("TENANT_ID")
+      }
+alloy-singleton:
+  enabled: true
+  alloy:
+    extraEnv: *extra-env
+alloy-logs:
+  enabled: true
+  alloy:
+    extraEnv: *extra-env
+
+#
+# Destinations
+#
+destinations:
+  - name: metrics
+    type: prometheus
+    urlFrom: sys.env("PROMETHEUS_DESTINATION_URL")
+    tenantIdFrom: sys.env("TENANT_ID")
+  - name: logs
+    type: loki
+    urlFrom: sys.env("LOKI_DESTINATION_URL")
+    tenantIdFrom: sys.env("TENANT_ID")
+
+#
+# Features
+#
+clusterMetrics:
+  enabled: true
+  windows-exporter:
+    enabled: false
+    deploy: false
+  cadvisor:
+    jobLabel: cadvisor
+  kubelet:
+    jobLabel: kubelet
+  kubeletResource:
+    jobLabel: kubelet
+  kube-state-metrics:
+    jobLabel: kube-state-metrics
+  kubeScheduler:
+    jobLabel: kube-scheduler
+  kubeControllerManager:
+    jobLabel: kube-controller-manager
+  apiServer:
+    jobLabel: kube-apiserver
+  kubeProxy:
+    jobLabel: kube-proxy
+  node-exporter:
+    jobLabel: node-exporter
+    metricsTuning:
+      useIntegrationAllowList: true
+clusterEvents:
+  enabled: true
+nodeLogs:
+  enabled: true
+podLogs:
+  enabled: true
+prometheusOperatorObjects:
+  enabled: true

@@ -1,0 +1,42 @@
+mimir:
+  structuredConfig:
+    limits:
+      ruler_max_rules_per_rule_group: 30 # デフォルトの20では monitoring-mixin の rule は収まらない
+      max_global_exemplars_per_user: 100000 # exemplar として送られてきた trace id 等を保存可能にする
+    alertmanager_storage:
+      backend: s3
+      s3: &s3
+        bucket_name: mimir-alertmanager
+        endpoint: minio.minio.svc:9000
+        insecure: true
+        access_key_id: sandbox
+        secret_access_key: supersecret
+    blocks_storage:
+      backend: s3
+      s3:
+        <<: *s3
+        bucket_name: mimir-tsdb
+      tsdb:
+        flush_blocks_on_shutdown: true
+    ruler_storage:
+      backend: s3
+      s3:
+        <<: *s3
+        bucket_name: mimir-ruler
+    ingester:
+      ring:
+        replication_factor: 1 # dev:1, prod:3
+    alertmanager:
+      sharding_ring:
+        replication_factor: 1 # dev:1, prod:3
+    store_gateway:
+      sharding_ring:
+        replication_factor: 1 # dev:1, prod:1 or 3
+
+metaMonitoring:
+  serviceMonitor:
+    enabled: true
+    clusterLabel: null
+
+minio:
+  enabled: false

@@ -1,0 +1,61 @@
+{{/*
+Expand the name of the chart.
+*/}}
+{{- define "monitoring-mixin.name" -}}
+{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Create a default fully qualified app name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+If release name contains chart name it will be used as a full name.
+*/}}
+{{- define "monitoring-mixin.fullname" -}}
+{{- if .Values.fullnameOverride }}
+{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- $name := default .Chart.Name .Values.nameOverride }}
+{{- if or (contains $name .Release.Name) .Values.useReleaseNameAsFullName }}
+{{- .Release.Name | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
+Create chart name and version as used by the chart label.
+*/}}
+{{- define "monitoring-mixin.chart" -}}
+{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Common labels
+*/}}
+{{- define "monitoring-mixin.labels" -}}
+helm.sh/chart: {{ include "monitoring-mixin.chart" . }}
+{{ include "monitoring-mixin.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end }}
+
+{{/*
+Fail if generated directory for mixinName does not exist.
+*/}}
+{{- define "monitoring-mixin.requireMixinGenerated" -}}
+{{- $dir := printf "generated/%s" .Values.mixinName -}}
+{{- if not (.Files.Glob (printf "%s/**" $dir)) -}}
+{{- fail (printf "generated directory not found: %s (run 'just generate_mixin %s')" $dir .Values.mixinName) -}}
+{{- end -}}
+{{- end }}
+
+{{/*
+Selector labels
+*/}}
+{{- define "monitoring-mixin.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "monitoring-mixin.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}

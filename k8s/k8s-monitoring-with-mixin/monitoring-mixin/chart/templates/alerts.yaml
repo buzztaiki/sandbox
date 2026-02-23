@@ -1,0 +1,14 @@
+{{- include "monitoring-mixin.requireMixinGenerated" . }}
+{{- $path :=  printf "generated/%s/alerts.yaml" .Values.mixinName }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "monitoring-mixin.fullname" . }}-alert
+  annotations:
+    {{- with .Values.alert.annotations }}{{- toYaml . | nindent 4 }}{{- end }}
+  labels:
+    {{- include "monitoring-mixin.labels" . | nindent 4 }}
+    {{- with .Values.alert.labels }}{{- toYaml . | nindent 4 }}{{- end }}
+spec:
+  {{- .Files.Get $path | nindent 2 }}

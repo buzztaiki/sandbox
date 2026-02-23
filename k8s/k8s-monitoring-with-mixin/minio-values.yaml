@@ -1,0 +1,39 @@
+mode: standalone
+drivesPerNode: 2
+rootUser: sandbox
+rootPassword: supersecret
+
+consoleIngress:
+  enabled: true
+  hosts:
+    - minio.k8s.localhost
+
+buckets:
+  - name: loki-chunks
+    policy: none
+    purge: false
+  - name: loki-ruler
+    policy: none
+    purge: false
+
+  - name: mimir-tsdb
+    policy: none
+    purge: false
+  - name: mimir-ruler
+    policy: none
+    purge: false
+  - name: mimir-alertmanager
+    policy: none
+    purge: false
+
+  - name: tempo-traces
+    policy: none
+    purge: false
+
+persistence:
+  size: 5Gi
+  annotations: {}
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi

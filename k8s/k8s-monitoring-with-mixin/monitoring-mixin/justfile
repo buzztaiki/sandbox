@@ -1,0 +1,37 @@
+set quiet
+jsonnet_libs := "jsonnet_libs"
+
+install *args:
+    go tool jb install --jsonnetpkg-home {{jsonnet_libs}} {{args}}
+
+update *args:
+    go tool jb update --jsonnetpkg-home {{jsonnet_libs}} {{args}}
+
+generate: install
+    #!/bin/bash -e
+    for f in mixins/*.libsonnet; do
+      mixin=$(basename $f .libsonnet)
+      just generate_mixin $mixin
+    done
+
+generate_mixin mixin:
+    #!/bin/bash -e
+    generated=chart/generated/{{mixin}}
+    rm -rf $generated && mkdir -p $generated/dashboards
+    just render_alerts {{mixin}} | yq -P > $generated/alerts.yaml
+    just render_rules {{mixin}} | yq -P > $generated/rules.yaml
+    just render_dashboards {{mixin}} --multi $generated/dashboards >/dev/null
+
+check:
+    find mixins -name '*.jsonnet' -o -name '*.libsonnet' | xargs -n 1 go tool jsonnet-lint -J {{jsonnet_libs}} --
+    find mixins -name '*.jsonnet' -o -name '*.libsonnet' | xargs go tool jsonnetfmt --test --
+
+fmt:
+    find mixins -name '*.jsonnet' -o -name '*.libsonnet' | xargs go tool jsonnetfmt -i --
+
+render_alerts mixin *args:
+    go tool jsonnet -J {{jsonnet_libs}} {{args}} -e '(import "./mixins/{{mixin}}.libsonnet").prometheusAlerts'
+render_rules mixin *args:
+    go tool jsonnet -J {{jsonnet_libs}} {{args}} -e '(import "./mixins/{{mixin}}.libsonnet").prometheusRules'
+render_dashboards mixin *args:
+    go tool jsonnet -J {{jsonnet_libs}} {{args}} -e '(import "./mixins/{{mixin}}.libsonnet").grafanaDashboards'
