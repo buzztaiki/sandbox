@@ -1,3 +1,4 @@
+{{- include "monitoring-mixin.requireMixinGenerated" . }}
 {{- $currentScope := . }}
 {{- range $path, $_ :=  .Files.Glob  (printf "generated/%s/dashboards/*.json" .Values.mixinName) }}
 {{- with $currentScope }}

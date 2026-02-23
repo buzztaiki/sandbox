@@ -1,3 +1,4 @@
+{{- include "monitoring-mixin.requireMixinGenerated" . }}
 {{- $path :=  printf "generated/%s/alerts.yaml" .Values.mixinName }}
 ---
 apiVersion: monitoring.coreos.com/v1

@@ -43,6 +43,16 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
+Fail if generated directory for mixinName does not exist.
+*/}}
+{{- define "monitoring-mixin.requireMixinGenerated" -}}
+{{- $dir := printf "generated/%s" .Values.mixinName -}}
+{{- if not (.Files.Glob (printf "%s/**" $dir)) -}}
+{{- fail (printf "generated directory not found: %s (run 'just generate_mixin %s')" $dir .Values.mixinName) -}}
+{{- end -}}
+{{- end }}
+
+{{/*
 Selector labels
 */}}
 {{- define "monitoring-mixin.selectorLabels" -}}
