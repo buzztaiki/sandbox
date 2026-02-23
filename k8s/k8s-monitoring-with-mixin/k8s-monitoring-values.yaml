@@ -55,6 +55,8 @@ clusterMetrics:
     jobLabel: cadvisor
   kubelet:
     jobLabel: kubelet
+  kubeletResource:
+    jobLabel: kubelet
   kube-state-metrics:
     jobLabel: kube-state-metrics
   kubeScheduler:
@@ -68,7 +70,7 @@ clusterMetrics:
   node-exporter:
     jobLabel: node-exporter
     metricsTuning:
-      includeMetrics: [node_uname_info]
+      useIntegrationAllowList: true
 clusterEvents:
   enabled: true
 nodeLogs:
