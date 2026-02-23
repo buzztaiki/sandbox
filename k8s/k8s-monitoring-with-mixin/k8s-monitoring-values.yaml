@@ -16,11 +16,11 @@ alloy-metrics:
         value: http://mimir-gateway.mimir.svc:8080
       - name: TENANT_ID
         value: kind
-    extraConfig: |
-      mimir.rules.kubernetes "default" {
-        address   = sys.env("MIMIR_URL")
-        tenant_id = sys.env("TENANT_ID")
-      }
+  extraConfig: |
+    mimir.rules.kubernetes "default" {
+      address   = sys.env("MIMIR_URL")
+      tenant_id = sys.env("TENANT_ID")
+    }
 alloy-singleton:
   enabled: true
   alloy:
