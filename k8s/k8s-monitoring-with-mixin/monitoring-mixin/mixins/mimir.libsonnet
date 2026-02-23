@@ -1,4 +1,4 @@
-local mimir = import 'mimir-mixin/mixin.libsonnet';
+local mimir = import 'github.com/grafana/mimir/operations/mimir-mixin/mixin.libsonnet';
 local utils = import 'utils.libsonnet';
 
 mimir {

@@ -1,4 +1,4 @@
-local node = import 'node-mixin/mixin.libsonnet';
+local node = import 'github.com/prometheus/node_exporter/docs/node-mixin/mixin.libsonnet';
 local utils = import 'utils.libsonnet';
 
 node {
