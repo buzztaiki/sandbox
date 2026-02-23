@@ -4,6 +4,8 @@ go 1.25.0
 
 tool (
 	github.com/google/go-jsonnet/cmd/jsonnet
+	github.com/google/go-jsonnet/cmd/jsonnet-lint
+	github.com/google/go-jsonnet/cmd/jsonnetfmt
 	github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb
 )
 

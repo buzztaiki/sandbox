@@ -1,5 +1,5 @@
-local loki = import 'github.com/grafana/loki/production/loki-mixin/mixin.libsonnet';
 local utils = import './lib/utils.libsonnet';
+local loki = import 'github.com/grafana/loki/production/loki-mixin/mixin.libsonnet';
 
 loki {
   _config+:: {

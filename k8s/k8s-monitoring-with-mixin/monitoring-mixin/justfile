@@ -22,6 +22,15 @@ generate_mixin mixin:
     just render_rules {{mixin}} | yq -P > $generated/rules.yaml
     just render_dashboards {{mixin}} --multi $generated/dashboards >/dev/null
 
+check:
+    #!/bin/bash -e
+    find mixins -name '*.jsonnet' -o -name '*.libsonnet' | while read -r f; do
+      go tool jsonnet-lint -J {{jsonnet_libs}} -- "$f"
+    done
+
+fmt:
+    find mixins -name '*.jsonnet' -o -name '*.libsonnet' | xargs go tool jsonnetfmt -i --
+
 render_alerts mixin *args:
     go tool jsonnet -J {{jsonnet_libs}} {{args}} -e '(import "./mixins/{{mixin}}.libsonnet").prometheusAlerts'
 render_rules mixin *args:
