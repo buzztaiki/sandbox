@@ -23,8 +23,8 @@ generate_mixin mixin:
     just render_dashboards {{mixin}} --multi $generated/dashboards >/dev/null
 
 render_alerts mixin *args:
-    go tool jsonnet -J {{jsonnet_libs}} {{args}} -e '(import "mixins/{{mixin}}.libsonnet").prometheusAlerts'
+    go tool jsonnet -J {{jsonnet_libs}} {{args}} -e '(import "./mixins/{{mixin}}.libsonnet").prometheusAlerts'
 render_rules mixin *args:
-    go tool jsonnet -J {{jsonnet_libs}} {{args}} -e '(import "mixins/{{mixin}}.libsonnet").prometheusRules'
+    go tool jsonnet -J {{jsonnet_libs}} {{args}} -e '(import "./mixins/{{mixin}}.libsonnet").prometheusRules'
 render_dashboards mixin *args:
-    go tool jsonnet -J {{jsonnet_libs}} {{args}} -e '(import "mixins/{{mixin}}.libsonnet").grafanaDashboards'
+    go tool jsonnet -J {{jsonnet_libs}} {{args}} -e '(import "./mixins/{{mixin}}.libsonnet").grafanaDashboards'
