@@ -24,6 +24,7 @@ generate_mixin mixin:
 
 check:
     find mixins -name '*.jsonnet' -o -name '*.libsonnet' | xargs -n 1 go tool jsonnet-lint -J {{jsonnet_libs}} --
+    find mixins -name '*.jsonnet' -o -name '*.libsonnet' | xargs go tool jsonnetfmt --test --
 
 fmt:
     find mixins -name '*.jsonnet' -o -name '*.libsonnet' | xargs go tool jsonnetfmt -i --
