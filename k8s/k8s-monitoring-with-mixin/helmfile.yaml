@@ -85,6 +85,7 @@ releases:
       - prometheus-operator/prometheus-operator-crds
     values:
       - k8s-monitoring-values.yaml
+      - k8s-monitoring-job-label-values.yaml
 
   - name: grafana
     chart: grafana-community/grafana

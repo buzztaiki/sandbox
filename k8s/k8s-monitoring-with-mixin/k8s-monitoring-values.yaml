@@ -51,14 +51,7 @@ clusterMetrics:
   windows-exporter:
     enabled: false
     deploy: false
-  cadvisor:
-    jobLabel: cadvisor
-  kubelet:
-    jobLabel: kubelet
-  kubeletResource:
-    jobLabel: kubelet
   kube-state-metrics:
-    jobLabel: kube-state-metrics
     metricLabelsAllowlist:
       # chart deafults
       - nodes=[agentpool,alpha.eksctl.io/cluster-name,alpha.eksctl.io/nodegroup-name,beta.kubernetes.io/instance-type,cloud.google.com/gke-nodepool,cluster-name,ec2.amazonaws.com/Name,ec2.amazonaws.com/aws-autoscaling-groupName,ec2.amazonaws.com/aws-autoscaling-group-name,ec2.amazonaws.com/name,eks.amazonaws.com/nodegroup,k8s.io/cloud-provider-aws,karpenter.sh/nodepool,kubernetes.azure.com/cluster,kubernetes.io/arch,kubernetes.io/hostname,kubernetes.io/os,node.kubernetes.io/instance-type,topology.kubernetes.io/region,topology.kubernetes.io/zone]
@@ -68,16 +61,7 @@ clusterMetrics:
       useDefaultAllowList: true
       includeMetrics:
         - kube_.*_labels
-  kubeScheduler:
-    jobLabel: kube-scheduler
-  kubeControllerManager:
-    jobLabel: kube-controller-manager
-  apiServer:
-    jobLabel: kube-apiserver
-  kubeProxy:
-    jobLabel: kube-proxy
   node-exporter:
-    jobLabel: node-exporter
     metricsTuning:
       useIntegrationAllowList: true
 clusterEvents:

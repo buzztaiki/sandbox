@@ -1,0 +1,19 @@
+clusterMetrics:
+  cadvisor:
+    jobLabel: cadvisor
+  kubelet:
+    jobLabel: kubelet
+  kubeletResource:
+    jobLabel: kubelet
+  kube-state-metrics:
+    jobLabel: kube-state-metrics
+  kubeScheduler:
+    jobLabel: kube-scheduler
+  kubeControllerManager:
+    jobLabel: kube-controller-manager
+  apiServer:
+    jobLabel: kube-apiserver
+  kubeProxy:
+    jobLabel: kube-proxy
+  node-exporter:
+    jobLabel: node-exporter
