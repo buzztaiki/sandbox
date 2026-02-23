@@ -18,7 +18,7 @@ generate: install
 generate_mixin mixin:
     #!/bin/bash -e
     generated=chart/generated/{{mixin}}
-    rm -rf $generated &&mkdir -p $generated/dashboards
+    rm -rf $generated && mkdir -p $generated/dashboards
     just render_alerts {{mixin}} | yq -P > $generated/alerts.yaml
     just render_rules {{mixin}} | yq -P > $generated/rules.yaml
     just render_dashboards {{mixin}} --multi $generated/dashboards >/dev/null
