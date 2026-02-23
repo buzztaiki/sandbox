@@ -4,6 +4,11 @@ local kubernetes = import 'github.com/kubernetes-monitoring/kubernetes-mixin/mix
 kubernetes {
   _config+:: {
     showMultiCluster: true,
+    common_join_labels: [
+      'label_app_kubernetes_io_name',
+      'label_app_kubernetes_io_instance',
+      'label_app_kubernetes_io_component',
+    ],
   },
   grafanaDashboards: utils.withBrowserTimezone({
     [x.key]: x.value

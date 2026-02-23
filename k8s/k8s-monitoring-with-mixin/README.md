@@ -19,3 +19,5 @@ kube-prometheus-stack を使わずに、k8s-monitoring と monitoring-mixin で�
 ## monitoring-mixin を自分でバンドルした感想
 
 やり方に慣れさえすればそこまで面倒でもないし、気にいらない所は手を入れられるので結構いいかもしれない。
+
+k8s-mixin の `common_join_labels` が便利っぽい。
