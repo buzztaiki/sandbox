@@ -1,5 +1,5 @@
 local mimir = import 'github.com/grafana/mimir/operations/mimir-mixin/mixin.libsonnet';
-local utils = import 'utils.libsonnet';
+local utils = import './lib/utils.libsonnet';
 
 mimir {
   _config+:: {

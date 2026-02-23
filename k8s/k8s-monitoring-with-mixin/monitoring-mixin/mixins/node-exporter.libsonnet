@@ -1,5 +1,5 @@
 local node = import 'github.com/prometheus/node_exporter/docs/node-mixin/mixin.libsonnet';
-local utils = import 'utils.libsonnet';
+local utils = import './lib/utils.libsonnet';
 
 node {
   _config+:: {
