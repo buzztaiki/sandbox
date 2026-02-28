@@ -6,8 +6,6 @@ config:
   data:
     enforce_sys_caps: true
     # trace_printer: text # 何を trace しているのか見たいときに有効にする
-    otel_metrics_export:
-      endpoint: http://alloy.alloy.svc:4318
     otel_traces_export:
       endpoint: http://alloy.alloy.svc:4318
     network:
@@ -24,3 +22,7 @@ config:
         - "*/metric*"
         - "*/health*"
         - "*/grpc.health*"
+
+serviceMonitor:
+  enabled: true
+
