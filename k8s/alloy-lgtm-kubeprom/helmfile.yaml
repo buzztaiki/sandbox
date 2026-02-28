@@ -1,3 +1,9 @@
+environments:
+  default:
+    values:
+      - beyla:
+          #  うちのローカルだと beyla があると結構な頻度で kernel crash をするぽいので、必要な時以外は false にする
+          enabled: false
 ---
 repositories:
   - name: grafana
@@ -87,6 +93,7 @@ releases:
     namespace: beyla
     needs:
       - alloy/alloy
+    condition: beyla.enabled
     values:
       - beyla/values.yaml
 
