@@ -26,3 +26,5 @@ config:
 serviceMonitor:
   enabled: true
 
+k8sCache:
+  replicas: 1
