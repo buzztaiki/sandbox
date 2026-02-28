@@ -200,7 +200,10 @@ otelcol.exporter.otlphttp "default" {
 
 otelcol.exporter.prometheus "default" {
 	honor_metadata = true
-	forward_to     = [prometheus.remote_write.default.receiver]
+	// NOTE: ラベルの数が多すぎるようなら resource_to_telemetry_conversion ではなく otelcol.processor.transform で明示的に metric label を設定する
+	// see: https://grafana.com/docs/alloy/latest/reference/components/otelcol/otelcol.exporter.prometheus/#create-prometheus-labels-from-otlp-resource-attributes
+	resource_to_telemetry_conversion = true
+	forward_to                       = [prometheus.remote_write.default.receiver]
 }
 
 // TODO: convert OTLP log attributes to loki.attribute.labels
