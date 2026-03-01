@@ -22,6 +22,10 @@ grafana:
       jsonData:
         prometheusType: Mimir
         prometheusVersion: "2.9.1"
+        exemplarTraceIdDestinations:
+          - datasourceUid: tempo
+            name: traceID
+            urlDisplayLabel: "Query with Tempo"
         httpHeaderName1: X-Scope-OrgID
       secureJsonData:
         httpHeaderValue1: kind
@@ -52,7 +56,16 @@ grafana:
       url: http://tempo-gateway.tempo.svc
       jsonData:
         serviceMap:
-          datasourceUid: "prometheus"
+          datasourceUid: prometheus
+        tracesToLogsV2:
+          datasourceUid: loki
+          filterByTraceID: true
+        tracesToMetrics:
+          datasourceUid: prometheus
+          queries:
+            - name: Span p95
+              query: |
+                histogram_quantile(0.95, sum(rate(traces_spanmetrics_latency_bucket{service="$${__span.tags["service.name"]}", span_name="$${__span.name}"}[$$__rate_interval])) by (le))
         httpHeaderName1: X-Scope-OrgID
       secureJsonData:
         httpHeaderValue1: kind
