@@ -1,0 +1,17 @@
+resources:
+  - apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      name: otel-demo
+    spec:
+      rules:
+        - host: otel-demo.k8s.localhost
+          http:
+            paths:
+              - path: /
+                pathType: Prefix
+                backend:
+                  service:
+                    name: frontend-proxy
+                    port:
+                      number: 8080

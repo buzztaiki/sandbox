@@ -14,6 +14,8 @@ repositories:
     url: https://charts.min.io
   - name: traefik
     url: https://traefik.github.io/charts
+  - name: bedag
+    url: https://bedag.github.io/helm-charts/
 
 helmDefaults:
   diffArgs:
@@ -106,3 +108,18 @@ releases:
   - name: httpbin
     chart: ./httpbin
     namespace: httpbin
+
+  - name: otel-demo
+    chart: open-telemetry/opentelemetry-demo
+    version: 0.40.4
+    namespace: otel-demo
+    needs:
+      - alloy/alloy
+    values:
+      - otel-demo/values.yaml
+  - name: otel-demo-extra
+    chart: bedag/raw
+    version: 2.0.2
+    namespace: otel-demo
+    values:
+      - otel-demo/extra-values.yaml
