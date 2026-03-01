@@ -307,20 +307,7 @@ graph TD
 ```
 
 ## TODO
-- readme
-  - 構成図的なやつを claude に書かせる
-以下は issue にして、いったんこれは終わりにする
-- otel
-  - beyla の metric は scrape と otel のどっちがよい？
-  - k8s 系の属性が metric についてこない
-    - scrape するなら `k8s_*` が付いてくるけど
-      - `k8s_` prefix を外したやつがあった方が他と統一できてよいかも
-    - otel metric の場合はどう扱う？
-  - metric と trace を紐付けたい
-    - 何かあったはず
-- ingress
-  - traefik.enabled を追加したい
-  - host 名を変えられるようにしたい
-    - helmfile の env にして、helmfile で set すればよさそうに思う
+- trace to metrics and trace to logs
+  - tempo datasource の設定でいけるはず
 - mimir.rules.kubernetes
   - external label: cluster
