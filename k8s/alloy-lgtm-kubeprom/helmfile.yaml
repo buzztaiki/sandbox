@@ -16,6 +16,8 @@ repositories:
     url: https://traefik.github.io/charts
   - name: bedag
     url: https://bedag.github.io/helm-charts/
+  - name: jaegertracing
+    url: https://jaegertracing.github.io/helm-charts
 
 helmDefaults:
   diffArgs:
@@ -88,6 +90,13 @@ releases:
       - kube-prometheus-stack/kube-prometheus-stack
     values:
       - tempo/values.yaml
+
+  - name: jaeger
+    chart: jaegertracing/jaeger
+    version: 4.5.0
+    namespace: jaeger
+    values:
+      - jaeger/values.yaml
 
   - name: beyla
     chart: grafana/beyla

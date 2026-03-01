@@ -185,11 +185,31 @@ otelcol.receiver.otlp "default" {
 	}
 }
 
-otelcol.exporter.otlphttp "default" {
+otelcol.exporter.otlp "tempo" {
 	client {
-		endpoint = sys.env("OTEL_HTTP_EXPORTER_URL")
+		endpoint = sys.env("OTEL_TEMPO_URL")
 		headers  = {
 			"X-Scope-OrgID" = sys.env("CLUSTER_NAME"),
+		}
+
+		tls {
+			insecure             = true
+			insecure_skip_verify = true
+		}
+	}
+
+	sending_queue {
+		batch { }
+	}
+}
+
+otelcol.exporter.otlp "jaeger" {
+	client {
+		endpoint = sys.env("OTEL_JAEGER_URL")
+
+		tls {
+			insecure             = true
+			insecure_skip_verify = true
 		}
 	}
 
@@ -287,6 +307,9 @@ otelcol.processor.transform "external_labels" {
 	}
 
 	output {
-		traces = [otelcol.exporter.otlphttp.default.input]
+		traces = [
+			otelcol.exporter.otlp.tempo.input,
+			otelcol.exporter.otlp.jaeger.input,
+		]
 	}
 }

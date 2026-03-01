@@ -36,8 +36,10 @@ alloy:
       value: http://mimir-gateway.mimir.svc
     - name: LOKI_REMOTE_WRITE_URL
       value: http://loki-gateway.loki.svc/loki/api/v1/push
-    - name: OTEL_HTTP_EXPORTER_URL
-      value: http://tempo-gateway.tempo.svc
+    - name: OTEL_TEMPO_URL
+      value: tempo-gateway.tempo.svc:4317
+    - name: OTEL_JAEGER_URL
+      value: jaeger.jaeger.svc:4317
     - name: OTEL_MEMORY_LIMIT
       value: 500MiB
     - name: OTEL_SAMPLING_RATE
