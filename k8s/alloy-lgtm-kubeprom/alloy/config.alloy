@@ -285,23 +285,39 @@ otelcol.processor.k8sattributes "default" {
 	}
 
 	output {
-		metrics = [otelcol.processor.batch.default.input]
-		logs    = [otelcol.processor.batch.default.input]
-		traces  = [otelcol.processor.transform.external_labels.input]
+		metrics = [otelcol.processor.attributes.metrics.input]
+		logs    = [otelcol.processor.attributes.logs.input]
+		traces  = [otelcol.processor.attributes.traces.input]
 	}
 }
 
-otelcol.processor.batch "default" {
+otelcol.processor.attributes "metrics" {
 	output {
-		metrics = [otelcol.exporter.debug.default.input, otelcol.exporter.prometheus.default.input]
-		logs    = [otelcol.exporter.debug.default.input, otelcol.exporter.loki.default.input]
+		metrics = [otelcol.processor.batch.default.input]
 	}
 }
 
-otelcol.processor.transform "external_labels" {
-	trace_statements {
-		context    = "resource"
-		statements = [
+otelcol.processor.attributes "logs" {
+	action {
+		key    = "loki.resource.labels"
+		action = "insert"
+		value  = "service.name, service.namespace"
+	}
+
+	output {
+		logs = [otelcol.processor.batch.default.input]
+	}
+}
+
+otelcol.processor.attributes "traces" {
+	output {
+		traces = [otelcol.processor.transform.traces.input]
+	}
+}
+
+otelcol.processor.transform "traces" {
+	statements {
+		trace = [
 			string.format(`set(resource.attributes["k8s.cluster.name"], %q)`, sys.env("CLUSTER_NAME")),
 		]
 	}
@@ -311,5 +327,12 @@ otelcol.processor.transform "external_labels" {
 			otelcol.exporter.otlp.tempo.input,
 			otelcol.exporter.otlp.jaeger.input,
 		]
+	}
+}
+
+otelcol.processor.batch "default" {
+	output {
+		metrics = [otelcol.exporter.debug.default.input, otelcol.exporter.prometheus.default.input]
+		logs    = [otelcol.exporter.debug.default.input, otelcol.exporter.loki.default.input]
 	}
 }
