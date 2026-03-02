@@ -108,6 +108,12 @@ releases:
     values:
       - beyla/values.yaml
 
+  - name: mythical
+    chart: ./mythical
+    namespace: mythical
+    needs:
+      - alloy/alloy
+
   - name: otel-demo
     chart: open-telemetry/opentelemetry-demo
     version: 0.40.4
