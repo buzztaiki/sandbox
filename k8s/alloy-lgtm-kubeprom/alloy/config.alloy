@@ -33,6 +33,9 @@ prometheus.remote_write "default" {
 		// NOTE: metric metadata を送信するには v2 request にする必要がある。metadata を送ると grafana で指標の説明を見ることができる。
 		// https://github.com/grafana/alloy/issues/5250
 		protobuf_message = "io.prometheus.write.v2.Request"
+
+		// exemplar を有効にして trace と紐付けできるようにする
+		send_exemplars = true
 	}
 	external_labels = {
 		cluster = sys.env("CLUSTER_NAME"),
