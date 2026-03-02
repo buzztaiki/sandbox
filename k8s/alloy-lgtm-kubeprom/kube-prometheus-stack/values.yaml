@@ -24,7 +24,7 @@ grafana:
         prometheusVersion: "2.9.1"
         exemplarTraceIdDestinations:
           - datasourceUid: tempo
-            name: traceID
+            name: trace_id
             urlDisplayLabel: "Query with Tempo"
         httpHeaderName1: X-Scope-OrgID
       secureJsonData:

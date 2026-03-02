@@ -24,6 +24,7 @@ overrides:
         - service-graphs
         - span-metrics
         - local-blocks
+      trace_id_label_name: trace_id
 
 ingester:
   config:
