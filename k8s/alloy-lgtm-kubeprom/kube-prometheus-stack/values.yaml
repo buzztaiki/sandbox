@@ -59,7 +59,9 @@ grafana:
           datasourceUid: prometheus
         tracesToLogsV2:
           datasourceUid: loki
-          filterByTraceID: true
+          customQuery: true
+          query: |
+            {service_namespace="$${__span.tags["service.namespace"]}", service_name="$${__span.tags["service.name"]}"} | json | traceid="$${__span.traceId}"
         tracesToMetrics:
           datasourceUid: prometheus
           queries:
