@@ -46,6 +46,13 @@ grafana:
       type: loki
       url: http://loki-gateway.loki.svc
       jsonData:
+        derivedFields:
+          - datasourceUid: tempo
+            name: Trace ID
+            urlDisplayLabel: View Trace
+            matcherType: regex
+            matcherRegex: '"traceid" *: *"(\w+)"'
+            url: $${__value.raw}
         httpHeaderName1: X-Scope-OrgID
       secureJsonData:
         httpHeaderValue1: kind
@@ -54,6 +61,7 @@ grafana:
       uid: tempo
       type: tempo
       url: http://tempo-gateway.tempo.svc
+      editable: true
       jsonData:
         serviceMap:
           datasourceUid: prometheus
