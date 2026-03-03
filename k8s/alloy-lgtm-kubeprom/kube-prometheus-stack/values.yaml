@@ -51,7 +51,7 @@ grafana:
             name: Trace ID
             urlDisplayLabel: View Trace
             matcherType: regex
-            matcherRegex: '"traceid" *: *"(\w+)"'
+            matcherRegex: '\b([a-f0-9]{32})\b'
             url: $${__value.raw}
         httpHeaderName1: X-Scope-OrgID
       secureJsonData:
