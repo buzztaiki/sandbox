@@ -69,7 +69,7 @@ grafana:
           datasourceUid: loki
           customQuery: true
           query: |
-            {service_namespace="$${__span.tags["service.namespace"]}", service_name="$${__span.tags["service.name"]}"} | json | traceid="$${__span.traceId}"
+            {cluster="$${__span.tags["k8s.cluster.name"]}", namespace="$${__span.tags["k8s.namespace.name"]}", service_name="$${__span.tags["service.name"]}"} |~ `$${__span.traceId}`
         tracesToMetrics:
           datasourceUid: prometheus
           queries:
