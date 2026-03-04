@@ -25,6 +25,7 @@ overrides:
         - span-metrics
         - local-blocks
       trace_id_label_name: trace_id
+      generate_native_histograms: native
 
 ingester:
   config:

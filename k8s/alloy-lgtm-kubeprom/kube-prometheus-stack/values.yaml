@@ -73,9 +73,12 @@ grafana:
         tracesToMetrics:
           datasourceUid: prometheus
           queries:
-            - name: Span p95
+            - name: Span p95 latency native histogram
               query: |
-                histogram_quantile(0.95, sum(rate(traces_spanmetrics_latency_bucket{service="$${__span.tags["service.name"]}", span_name="$${__span.name}"}[$$__rate_interval])) by (le))
+                histogram_quantile(0.95, sum(rate(traces_spanmetrics_latency{service="$${__span.tags["service.name"]}", span_name="$${__span.name}"} [$$__rate_interval])))
+            - name: Span p50 latency native histogram
+              query: |
+                histogram_quantile(0.50, sum(rate(traces_spanmetrics_latency{service="$${__span.tags["service.name"]}", span_name="$${__span.name}"} [$$__rate_interval])))
         httpHeaderName1: X-Scope-OrgID
       secureJsonData:
         httpHeaderValue1: kind
