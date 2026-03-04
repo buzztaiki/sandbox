@@ -4,6 +4,9 @@ mimir:
       # デフォルトの20では monitoring-mixin の rule は収まらない
       ruler_max_rules_per_rule_group: 30
 
+      # デフォルトの150000では色々やっていると全然足らない
+      max_global_series_per_user: 300000
+
       # https://grafana.com/docs/mimir/latest/manage/use-exemplars/store-exemplars/
       # > Start with a relatively low number (100,000) and adjust it if needed.
       max_global_exemplars_per_user: 100000
