@@ -4,6 +4,7 @@ environments:
       - beyla:
           #  うちのローカルだと beyla があると結構な頻度で kernel crash をするぽいので、必要な時以外は false にする
           enabled: false
+      - tiny: false
 ---
 repositories:
   - name: grafana
@@ -69,6 +70,9 @@ releases:
       - kube-prometheus-stack/kube-prometheus-stack
     values:
       - mimir/values.yaml
+      {{- if .Values.tiny }}
+      - mimir/tiny.yaml
+      {{- end }}
 
   - name: loki
     chart: grafana/loki
@@ -79,6 +83,9 @@ releases:
       - kube-prometheus-stack/kube-prometheus-stack
     values:
       - loki/values.yaml
+      {{- if .Values.tiny }}
+      - loki/tiny.yaml
+      {{- end }}
 
   - name: tempo
     chart: grafana-community/tempo-distributed
@@ -90,6 +97,9 @@ releases:
       - kube-prometheus-stack/kube-prometheus-stack
     values:
       - tempo/values.yaml
+      {{- if .Values.tiny }}
+      - tempo/tiny.yaml
+      {{- end }}
 
   - name: jaeger
     chart: jaegertracing/jaeger
