@@ -1,0 +1,36 @@
+// ----------------
+// Scrape module
+// ----------------
+declare "scrape" {
+	argument "forward_to" { }
+
+	prometheus.operator.servicemonitors "default" {
+		forward_to = argument.forward_to.value
+
+		clustering {
+			enabled = true
+		}
+		// TODO 1.13 では利用不可
+		// honor_metadata = true
+	}
+
+	prometheus.operator.podmonitors "default" {
+		forward_to = argument.forward_to.value
+
+		clustering {
+			enabled = true
+		}
+		// TODO 1.13 では利用不可
+		// honor_metadata = true
+	}
+
+	prometheus.exporter.self "default" { }
+
+	prometheus.scrape "self" {
+		targets    = prometheus.exporter.self.default.targets
+		forward_to = argument.forward_to.value
+		// NOTE: metric metadata を送信するにはこれを有効にする必要がある。なぜか、ここで有効にすると他の scrape でも metadata が有効になる
+		// https://github.com/grafana/alloy/issues/5250
+		honor_metadata = true
+	}
+}
