@@ -270,14 +270,14 @@ graph TD
     end
 
     %% Metrics pipeline
-    k8s_pods m1@-->| | disc_k8s
+    k8s_pods m1@-.->| | disc_k8s
     disc_k8s m2@-->| | disc_relabel_logs
     servicemonitors m4@-.->| | op_sm
     podmonitors m5@-.->| | op_pm
     prometheusrules m6@-.->| | mimir_rules
     op_sm m7@-->| | prom_rw
     op_pm m8@-->| | prom_rw
-    self m9@-->| | prom_self
+    self m9@-.->| | prom_self
     prom_self m10@-->| | prom_scrape_self
     prom_scrape_self m11@-->| | prom_rw
     otel_exp_prom m12@-->| | prom_rw
