@@ -68,18 +68,18 @@ graph LR
         traefik["Traefik (NodePort:30000)"]
     end
 
-    alloy_metrics m1@-.->|"scrape"| kube_monitors
-    alloy_metrics m2@-.->|"scrape"| exporters
-    alloy_rules m3@-.->|"PrometheusRules"| kube_rules
+    kube_monitors m1@-.->|"scrape"| alloy_metrics
+    exporters m2@-.->|"scrape"| alloy_metrics
+    kube_rules m3@-.->|"PrometheusRules"| alloy_rules
     alloy_metrics m4@-->|"remote_write"| mimir
     alloy_rules m5@-->|"rules sync"| mimir_ruler
     beyla b1@-->|"ServiceMonitor"| kube_monitors
-    mimir_ruler x1@-.->|"query"| mimir
+    mimir x1@-.->|"query result"| mimir_ruler
     mimir_ruler x2@-->|"recording rules"| mimir
     mimir_ruler x3@-->|"alerts"| mimir_am
     mimir s1@-->|"S3 (tsdb / ruler / alertmanager)"| minio
-    grafana r1@-.->|"PromQL"| mimir
-    grafana r2@-.->|"Alertmanager"| mimir_am
+    mimir r1@-.->|"PromQL result"| grafana
+    mimir_am r2@-.->|"alerts"| grafana
     traefik i1@-->|"grafana.k8s.localhost"| grafana
     traefik i2@-->|"otel-demo.k8s.localhost"| otel_demo
 
@@ -129,7 +129,7 @@ graph LR
     alloy_logs l3@-->|"k8s events"| loki
     alloy_otel l4@-->|"OTLP logs"| loki
     loki s1@-->|"S3 (chunks / ruler)"| minio
-    grafana r1@-.->|"LogQL"| loki
+    loki r1@-.->|"LogQL result"| grafana
     traefik i1@-->|"grafana.k8s.localhost"| grafana
     traefik i2@-->|"otel-demo.k8s.localhost"| otel_demo
 
@@ -194,7 +194,7 @@ graph LR
     alloy_otel m2@-->|"OTLP metrics"| mimir
     tempo_mg m1@-->|"remote_write (span metrics)"| mimir
     tempo s1@-->|"S3 (traces)"| minio
-    grafana r1@-.->|"TraceQL"| tempo
+    tempo r1@-.->|"TraceQL result"| grafana
     traefik i1@-->|"grafana.k8s.localhost"| grafana
     traefik i2@-->|"otel-demo.k8s.localhost"| otel_demo
 
@@ -278,7 +278,7 @@ graph TD
     op_sm m7@-->| | prom_rw
     op_pm m8@-->| | prom_rw
     self m9@-.->| | prom_self
-    prom_self m10@-->| | prom_scrape_self
+    prom_self m10@-.->| | prom_scrape_self
     prom_scrape_self m11@-->| | prom_rw
     otel_exp_prom m12@-->| | prom_rw
     prom_rw m13@-->|"remote_write"| mimir
