@@ -13,19 +13,25 @@ https://grafana.com/docs/alloy/latest/
   - [x] pod logs
   - [x] otel traces, metrics, logs
 - kube-prom-stack
-  - [x] without prometheus or alertmanager
+  - [x] without prometheus and alertmanager
   - [x] crds
   - [x] exporters & service monitors
   - [x] rules
   - [x] grafana
+    - [x] trace to metrics
+    - [x] trace to log
+    - [x] log to trace
+    - [x] metrics to trace (exemplar)
   - [x] dashboards
 - [x] mimir
   - [x] ruler
   - [x] alertmanager
+  - [x] exemplar
+  - [x] native histogram
 - [x] loki
 - [x] tempo
+  - [x] metrics generator (service graph, span metrics)
 - [x] beyla
-
 
 ## 構成図
 
@@ -317,9 +323,3 @@ graph TD
     class l1,l2,l3,l4,l5,l6,l7 logs
     class o1,o2,o3,o4,o5,o6,o7,o8,o9,o10,o11,o12,o13,o14 traces
 ```
-
-## TODO
-- [x] trace to metrics and trace to logs
-  - tempo datasource の設定でいけるはず
-- [x] mimir.rules.kubernetes
-  - external label: cluster
