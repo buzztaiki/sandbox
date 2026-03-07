@@ -22,6 +22,10 @@ grafana:
       jsonData:
         prometheusType: Mimir
         prometheusVersion: "2.9.1"
+        exemplarTraceIdDestinations:
+          - datasourceUid: tempo
+            name: trace_id
+            urlDisplayLabel: "Query with Tempo"
         httpHeaderName1: X-Scope-OrgID
       secureJsonData:
         httpHeaderValue1: kind
@@ -42,6 +46,13 @@ grafana:
       type: loki
       url: http://loki-gateway.loki.svc
       jsonData:
+        derivedFields:
+          - datasourceUid: tempo
+            name: Trace ID
+            urlDisplayLabel: View Trace
+            matcherType: regex
+            matcherRegex: '\b([a-f0-9]{32})\b'
+            url: $${__value.raw}
         httpHeaderName1: X-Scope-OrgID
       secureJsonData:
         httpHeaderValue1: kind
@@ -50,9 +61,24 @@ grafana:
       uid: tempo
       type: tempo
       url: http://tempo-gateway.tempo.svc
+      editable: true
       jsonData:
         serviceMap:
-          datasourceUid: "prometheus"
+          datasourceUid: prometheus
+        tracesToLogsV2:
+          datasourceUid: loki
+          customQuery: true
+          query: |
+            {cluster="$${__span.tags["k8s.cluster.name"]}", namespace="$${__span.tags["k8s.namespace.name"]}", service_name="$${__span.tags["service.name"]}"} |~ `$${__span.traceId}`
+        tracesToMetrics:
+          datasourceUid: prometheus
+          queries:
+            - name: Span p95 latency native histogram
+              query: |
+                histogram_quantile(0.95, sum(rate(traces_spanmetrics_latency{service="$${__span.tags["service.name"]}", span_name="$${__span.name}"} [$$__rate_interval])))
+            - name: Span p50 latency native histogram
+              query: |
+                histogram_quantile(0.50, sum(rate(traces_spanmetrics_latency{service="$${__span.tags["service.name"]}", span_name="$${__span.name}"} [$$__rate_interval])))
         httpHeaderName1: X-Scope-OrgID
       secureJsonData:
         httpHeaderValue1: kind

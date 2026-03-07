@@ -1,0 +1,29 @@
+default:
+  envOverrides:
+    - name: OTEL_COLLECTOR_NAME
+      value: alloy.alloy.svc
+
+opentelemetry-collector:
+  enabled: false
+jaeger:
+  enabled: false
+prometheus:
+  enabled: false
+grafana:
+  enabled: false
+opensearch:
+  enabled: false
+
+components:
+  kafka:
+    resources:
+      limits:
+        memory: 1.2Gi
+  ad:
+    resources:
+      limits:
+        memory: 600Mi
+  fraud-detection:
+    resources:
+      limits:
+        memory: 600Mi

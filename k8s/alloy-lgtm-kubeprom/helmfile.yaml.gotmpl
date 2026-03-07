@@ -1,3 +1,10 @@
+environments:
+  default:
+    values:
+      - beyla:
+          #  うちのローカルだと beyla があると結構な頻度で kernel crash をするぽいので、必要な時以外は false にする
+          enabled: false
+      - tiny: false
 ---
 repositories:
   - name: grafana
@@ -8,6 +15,10 @@ repositories:
     url: https://charts.min.io
   - name: traefik
     url: https://traefik.github.io/charts
+  - name: bedag
+    url: https://bedag.github.io/helm-charts/
+  - name: jaegertracing
+    url: https://jaegertracing.github.io/helm-charts
 
 helmDefaults:
   diffArgs:
@@ -59,6 +70,9 @@ releases:
       - kube-prometheus-stack/kube-prometheus-stack
     values:
       - mimir/values.yaml
+      {{- if .Values.tiny }}
+      - mimir/tiny.yaml
+      {{- end }}
 
   - name: loki
     chart: grafana/loki
@@ -69,6 +83,9 @@ releases:
       - kube-prometheus-stack/kube-prometheus-stack
     values:
       - loki/values.yaml
+      {{- if .Values.tiny }}
+      - loki/tiny.yaml
+      {{- end }}
 
   - name: tempo
     chart: grafana-community/tempo-distributed
@@ -80,6 +97,16 @@ releases:
       - kube-prometheus-stack/kube-prometheus-stack
     values:
       - tempo/values.yaml
+      {{- if .Values.tiny }}
+      - tempo/tiny.yaml
+      {{- end }}
+
+  - name: jaeger
+    chart: jaegertracing/jaeger
+    version: 4.5.0
+    namespace: jaeger
+    values:
+      - jaeger/values.yaml
 
   - name: beyla
     chart: grafana/beyla
@@ -87,6 +114,7 @@ releases:
     namespace: beyla
     needs:
       - alloy/alloy
+    condition: beyla.enabled
     values:
       - beyla/values.yaml
 
@@ -96,6 +124,17 @@ releases:
     needs:
       - alloy/alloy
 
-  - name: httpbin
-    chart: ./httpbin
-    namespace: httpbin
+  - name: otel-demo
+    chart: open-telemetry/opentelemetry-demo
+    version: 0.40.4
+    namespace: otel-demo
+    needs:
+      - alloy/alloy
+    values:
+      - otel-demo/values.yaml
+  - name: otel-demo-extra
+    chart: bedag/raw
+    version: 2.0.2
+    namespace: otel-demo
+    values:
+      - otel-demo/extra-values.yaml

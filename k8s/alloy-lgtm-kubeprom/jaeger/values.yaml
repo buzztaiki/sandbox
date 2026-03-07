@@ -1,0 +1,4 @@
+jaeger:
+  ingress:
+    enabled: true
+    hosts: [jaeger.k8s.localhost]
