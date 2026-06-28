@@ -13,19 +13,25 @@ https://grafana.com/docs/alloy/latest/
   - [x] pod logs
   - [x] otel traces, metrics, logs
 - kube-prom-stack
-  - [x] without prometheus or alertmanager
+  - [x] without prometheus and alertmanager
   - [x] crds
   - [x] exporters & service monitors
   - [x] rules
   - [x] grafana
+    - [x] trace to metrics
+    - [x] trace to log
+    - [x] log to trace
+    - [x] metrics to trace (exemplar)
   - [x] dashboards
 - [x] mimir
   - [x] ruler
   - [x] alertmanager
+  - [x] exemplar
+  - [x] native histogram
 - [x] loki
 - [x] tempo
+  - [x] metrics generator (service graph, span metrics)
 - [x] beyla
-
 
 ## 構成図
 
@@ -34,8 +40,9 @@ https://grafana.com/docs/alloy/latest/
 ```mermaid
 graph LR
     subgraph apps["アプリケーション"]
-        httpbin["httpbin"]
+        otel_demo["otel-demo"]
         mythical["mythical"]
+        beyla["Beyla (eBPF, optional)"]
     end
 
     subgraph kps["kube-prometheus-stack"]
@@ -67,26 +74,27 @@ graph LR
         traefik["Traefik (NodePort:30000)"]
     end
 
-    alloy_metrics m1@-.->|"scrape"| kube_monitors
-    alloy_metrics m2@-.->|"scrape"| exporters
-    alloy_rules m3@-.->|"PrometheusRules"| kube_rules
+    kube_monitors m1@-.->|"scrape"| alloy_metrics
+    exporters m2@-.->|"scrape"| alloy_metrics
+    kube_rules m3@-.->|"PrometheusRules"| alloy_rules
     alloy_metrics m4@-->|"remote_write"| mimir
     alloy_rules m5@-->|"rules sync"| mimir_ruler
-    mimir_ruler x1@-.->|"query"| mimir
+    beyla b1@-->|"ServiceMonitor"| kube_monitors
+    mimir x1@-.->|"query result"| mimir_ruler
     mimir_ruler x2@-->|"recording rules"| mimir
     mimir_ruler x3@-->|"alerts"| mimir_am
     mimir s1@-->|"S3 (tsdb / ruler / alertmanager)"| minio
-    grafana r1@-.->|"PromQL"| mimir
-    grafana r2@-.->|"Alertmanager"| mimir_am
+    mimir r1@-.->|"PromQL result"| grafana
+    mimir_am r2@-.->|"alerts"| grafana
     traefik i1@-->|"grafana.k8s.localhost"| grafana
-    traefik i2@-->|"httpbin.k8s.localhost"| httpbin
+    traefik i2@-->|"otel-demo.k8s.localhost"| otel_demo
 
     classDef metrics stroke:#f5a623
     classDef storage stroke:#95a5a6
     classDef read stroke:#c0392b
     classDef ingress stroke:#3498db
 
-    class m1,m2,m3,m4,m5,x1,x2,x3 metrics
+    class m1,m2,m3,m4,m5,b1,x1,x2,x3 metrics
     class s1 storage
     class r1,r2 read
     class i1,i2 ingress
@@ -97,7 +105,7 @@ graph LR
 ```mermaid
 graph LR
     subgraph apps["アプリケーション"]
-        httpbin["httpbin"]
+        otel_demo["otel-demo"]
         mythical["mythical"]
     end
 
@@ -127,9 +135,9 @@ graph LR
     alloy_logs l3@-->|"k8s events"| loki
     alloy_otel l4@-->|"OTLP logs"| loki
     loki s1@-->|"S3 (chunks / ruler)"| minio
-    grafana r1@-.->|"LogQL"| loki
+    loki r1@-.->|"LogQL result"| grafana
     traefik i1@-->|"grafana.k8s.localhost"| grafana
-    traefik i2@-->|"httpbin.k8s.localhost"| httpbin
+    traefik i2@-->|"otel-demo.k8s.localhost"| otel_demo
 
     classDef logs stroke:#27ae60
     classDef storage stroke:#95a5a6
@@ -147,7 +155,7 @@ graph LR
 ```mermaid
 graph LR
     subgraph apps["アプリケーション"]
-        httpbin["httpbin"]
+        otel_demo["otel-demo"]
         mythical["mythical"]
     end
 
@@ -162,6 +170,10 @@ graph LR
     subgraph tempo_ns["Tempo"]
         tempo["Tempo (trace store)"]
         tempo_mg["MetricsGenerator (span-metrics, service-graphs)"]
+    end
+
+    subgraph jaeger_ns["Jaeger"]
+        jaeger["Jaeger (trace store)"]
     end
 
     subgraph mimir_ns["Mimir"]
@@ -183,13 +195,14 @@ graph LR
     beyla t1@-->|"OTLP (:4318)"| alloy_otel
     apps t2@-->|"OTLP (:4317/:4318)"| alloy_otel
     alloy_otel t3@-->|"OTLP traces"| tempo
+    alloy_otel t5@-->|"OTLP traces"| jaeger
     tempo t4@-->|"spans"| tempo_mg
     alloy_otel m2@-->|"OTLP metrics"| mimir
     tempo_mg m1@-->|"remote_write (span metrics)"| mimir
     tempo s1@-->|"S3 (traces)"| minio
-    grafana r1@-.->|"TraceQL"| tempo
+    tempo r1@-.->|"TraceQL result"| grafana
     traefik i1@-->|"grafana.k8s.localhost"| grafana
-    traefik i2@-->|"httpbin.k8s.localhost"| httpbin
+    traefik i2@-->|"otel-demo.k8s.localhost"| otel_demo
 
     classDef traces stroke:#9b59b6
     classDef metrics stroke:#f5a623
@@ -197,7 +210,7 @@ graph LR
     classDef read stroke:#c0392b
     classDef ingress stroke:#3498db
 
-    class t1,t2,t3,t4 traces
+    class t1,t2,t3,t4,t5 traces
     class m1,m2 metrics
     class s1 storage
     class r1 read
@@ -219,36 +232,39 @@ graph TD
     end
 
     subgraph alloy_ns["Alloy"]
-        subgraph metrics_pipeline["Metrics Pipeline"]
-            disc_k8s["discovery.kubernetes"]
-            disc_relabel["discovery.relabel"]
+        disc_k8s["discovery.kubernetes"]
+        prom_rw["prometheus.remote_write"]
+        mimir_rules["mimir.rules.kubernetes"]
+        loki_write["loki.write"]
+        subgraph exporters["Exporters (otelcol)"]
+            otel_exp_prom["otelcol.exporter.prometheus"]
+            otel_exp_loki["otelcol.exporter.loki"]
+            otel_exp_otlp_tempo["otelcol.exporter.otlp / tempo"]
+            otel_exp_otlp_jaeger["otelcol.exporter.otlp / jaeger"]
+        end
+
+        subgraph scrape_alloy["scrape.alloy (declare)"]
             op_sm["prometheus.operator.servicemonitors"]
             op_pm["prometheus.operator.podmonitors"]
             prom_self["prometheus.exporter.self"]
             prom_scrape_self["prometheus.scrape / self"]
-            prom_rw["prometheus.remote_write"]
-            mimir_rules["mimir.rules.kubernetes"]
         end
 
-        subgraph logs_pipeline["Logs Pipeline"]
+        subgraph log_alloy["log.alloy (declare)"]
             disc_relabel_logs["discovery.relabel / pod_logs"]
             file_match["local.file_match"]
             loki_file["loki.source.file"]
             loki_events["loki.source.kubernetes_events"]
-            loki_write["loki.write"]
         end
 
-        subgraph otel_pipeline["OTel Pipeline"]
+        subgraph otel_alloy["otel.alloy (declare)"]
             otel_recv["otelcol.receiver.otlp"]
             otel_mem["otelcol.processor.memory_limiter"]
             otel_sampler["otelcol.processor.probabilistic_sampler"]
             otel_resdet["otelcol.processor.resourcedetection"]
             otel_k8sattr["otelcol.processor.k8sattributes"]
+            otel_transform["otelcol.processor.transform"]
             otel_batch["otelcol.processor.batch"]
-            otel_transform["otelcol.processor.transform / external_labels"]
-            otel_exp_prom["otelcol.exporter.prometheus"]
-            otel_exp_loki["otelcol.exporter.loki"]
-            otel_exp_otlp["otelcol.exporter.otlphttp"]
         end
     end
 
@@ -256,19 +272,19 @@ graph TD
         mimir["Mimir"]
         loki["Loki"]
         tempo["Tempo"]
+        jaeger["Jaeger"]
     end
 
     %% Metrics pipeline
-    k8s_pods m1@-->| | disc_k8s
-    disc_k8s m2@-->| | disc_relabel
-    disc_relabel m3@-->| | disc_relabel_logs
+    k8s_pods m1@-.->| | disc_k8s
+    disc_k8s m2@-->| | disc_relabel_logs
     servicemonitors m4@-.->| | op_sm
     podmonitors m5@-.->| | op_pm
     prometheusrules m6@-.->| | mimir_rules
     op_sm m7@-->| | prom_rw
     op_pm m8@-->| | prom_rw
-    self m9@-->| | prom_self
-    prom_self m10@-->| | prom_scrape_self
+    self m9@-.->| | prom_self
+    prom_self m10@-.->| | prom_scrape_self
     prom_scrape_self m11@-->| | prom_rw
     otel_exp_prom m12@-->| | prom_rw
     prom_rw m13@-->|"remote_write"| mimir
@@ -290,24 +306,20 @@ graph TD
     otel_mem o4@-->|"metrics/logs"| otel_resdet
     otel_sampler o5@-->|"traces"| otel_resdet
     otel_resdet o6@-->| | otel_k8sattr
-    otel_k8sattr o7@-->|"metrics/logs"| otel_batch
-    otel_k8sattr o8@-->|"traces"| otel_transform
-    otel_batch o9@-->|"metrics"| otel_exp_prom
-    otel_batch o10@-->|"logs"| otel_exp_loki
-    otel_transform o11@-->|"traces"| otel_exp_otlp
-    otel_exp_otlp o12@-->|"OTLP"| tempo
+    otel_k8sattr o7@-->| | otel_transform
+    otel_transform o8@-->|"metrics/logs"| otel_batch
+    otel_transform o9@-->|"traces"| otel_exp_otlp_tempo
+    otel_transform o10@-->|"traces"| otel_exp_otlp_jaeger
+    otel_batch o11@-->|"metrics"| otel_exp_prom
+    otel_batch o12@-->|"logs"| otel_exp_loki
+    otel_exp_otlp_tempo o13@-->|"OTLP"| tempo
+    otel_exp_otlp_jaeger o14@-->|"OTLP"| jaeger
 
     classDef metrics stroke:#f5a623
     classDef logs stroke:#27ae60
     classDef traces stroke:#9b59b6
 
-    class m1,m2,m3,m4,m5,m6,m7,m8,m9,m10,m11,m12,m13,m14 metrics
+    class m1,m2,m4,m5,m6,m7,m8,m9,m10,m11,m12,m13,m14 metrics
     class l1,l2,l3,l4,l5,l6,l7 logs
-    class o1,o2,o3,o4,o5,o6,o7,o8,o9,o10,o11,o12 traces
+    class o1,o2,o3,o4,o5,o6,o7,o8,o9,o10,o11,o12,o13,o14 traces
 ```
-
-## TODO
-- trace to metrics and trace to logs
-  - tempo datasource の設定でいけるはず
-- mimir.rules.kubernetes
-  - external label: cluster

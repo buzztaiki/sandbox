@@ -48,3 +48,6 @@ alloy:
   configMap:
     content: |
       {{- readFile "config.alloy" | nindent 6 }}
+      {{- readFile "scrape.alloy" | nindent 6 }}
+      {{- readFile "log.alloy" | nindent 6 }}
+      {{- readFile "otel.alloy" | nindent 6 }}
