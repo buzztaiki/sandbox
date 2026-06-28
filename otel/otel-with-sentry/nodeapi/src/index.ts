@@ -1,10 +1,11 @@
 import "./instrument.ts";
 
 import { serve } from "@hono/node-server";
+import { httpInstrumentationMiddleware } from "@hono/otel";
 import { sentry } from "@sentry/hono/node";
 import { Hono } from "hono";
 import { logger } from "hono/logger";
-import * as z from 'zod';
+import * as z from "zod";
 
 const NEXT_URL = process.env.NEXT_URL ?? "http://localhost:3000";
 
@@ -14,6 +15,7 @@ const ResultSchema = z.object({
 
 const app = new Hono();
 app.use(sentry(app));
+app.use(httpInstrumentationMiddleware());
 app.use(logger());
 
 app.get("/sum/:n", async (c) => {

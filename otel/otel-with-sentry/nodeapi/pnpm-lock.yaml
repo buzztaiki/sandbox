@@ -11,6 +11,9 @@ importers:
       '@hono/node-server':
         specifier: ^2.0.6
         version: 2.0.6(hono@4.12.27)
+      '@hono/otel':
+        specifier: ^1.1.2
+        version: 1.1.2(hono@4.12.27)
       '@sentry/hono':
         specifier: ^10.62.0
         version: 10.62.0(@hono/node-server@2.0.6(hono@4.12.27))(@sentry/node@10.62.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1)))(hono@4.12.27)
@@ -268,6 +271,11 @@ packages:
     engines: {node: '>=20'}
     peerDependencies:
       hono: ^4
+
+  '@hono/otel@1.1.2':
+    resolution: {integrity: sha512-UaBMKPGaQTj4sjvpGqQ+57eolTwMI2znzxV/QBUF99XxhcmqtqaZX95flXpGgWb+lnlinlCy23Y1sZ8+TzzM9A==}
+    peerDependencies:
+      hono: '>=4.0.0'
 
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
@@ -620,6 +628,12 @@ snapshots:
 
   '@hono/node-server@2.0.6(hono@4.12.27)':
     dependencies:
+      hono: 4.12.27
+
+  '@hono/otel@1.1.2(hono@4.12.27)':
+    dependencies:
+      '@opentelemetry/api': 1.9.1
+      '@opentelemetry/semantic-conventions': 1.41.1
       hono: 4.12.27
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
