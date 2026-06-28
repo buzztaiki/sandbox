@@ -1,0 +1,20 @@
+services:
+  nodeapi:
+    build: ./nodeapi
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./nodeapi/src:/app/src
+    environment:
+      SENTRY_DSN: ${SENTRY_DSN}
+      NEXT_URL: http://pyapi:8000
+
+  pyapi:
+    build: ./pyapi
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./pyapi/main.py:/app/main.py
+    environment:
+      SENTRY_DSN: ${SENTRY_DSN}
+      NEXT_URL: http://nodeapi:3000
