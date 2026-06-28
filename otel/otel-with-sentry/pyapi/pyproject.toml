@@ -7,6 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "fastapi[standard]>=0.138.1",
     "httpx>=0.28.1",
+    "sentry-sdk>=2.63.0",
 ]
 
 [dependency-groups]

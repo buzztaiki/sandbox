@@ -1,11 +1,16 @@
 import os
 
 import httpx
+import sentry_sdk
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 NEXT_URL = os.getenv("NEXT_URL", "http://localhost:8000")
 
+sentry_sdk.init(
+    dsn=os.getenv("SENTRY_DSN"),
+    traces_sample_rate=0.0,
+)
 app = FastAPI()
 
 
@@ -24,3 +29,8 @@ async def sum(n: int) -> Result:
         resp = await client.get(f"{NEXT_URL}/sum/{n - 1}")
     data = Result.model_validate(resp.json())
     return Result(result=data.result + n)
+
+
+@app.get("/error")
+def error():
+    raise RuntimeError("something went wrong")
