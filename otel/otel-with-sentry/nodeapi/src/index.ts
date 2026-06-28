@@ -1,4 +1,7 @@
+import "./instrument.ts";
+
 import { serve } from "@hono/node-server";
+import { sentry } from "@sentry/hono/node";
 import { Hono } from "hono";
 import { logger } from "hono/logger";
 import * as z from 'zod';
@@ -10,6 +13,7 @@ const ResultSchema = z.object({
 });
 
 const app = new Hono();
+app.use(sentry(app));
 app.use(logger());
 
 app.get("/sum/:n", async (c) => {
@@ -24,6 +28,10 @@ app.get("/sum/:n", async (c) => {
   const resp = await fetch(`${NEXT_URL}/sum/${n - 1}`);
   const data = ResultSchema.parse(await resp.json());
   return c.json({ result: data.result + n });
+});
+
+app.get("/error", async (_c) => {
+  throw new Error("something went wrong");
 });
 
 serve(
