@@ -45,6 +45,7 @@ services:
       OTEL_METRICS_EXPORTER: otlp
       OTEL_LOGS_EXPORTER: none
       OTEL_SEMCONV_STABILITY_OPT_IN: http,database,messaging
+      OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION: base2_exponential_bucket_histogram
 
   # ================
   # o11y stack
