@@ -20,14 +20,17 @@ app.use(logger());
 
 app.get("/sum/:n", async (c) => {
   const n = parseInt(c.req.param("n"), 10);
+  if (isNaN(n) || n < 0) {
+    return c.json({ error: "n must be a non-negative integer" }, 422);
+  }
   if (n === 0) {
     return c.json({ result: 0 });
   }
-  if (n < 0) {
-    return c.json({ error: "n must be a non-negative integer" }, 422);
-  }
 
   const resp = await fetch(`${NEXT_URL}/sum/${n - 1}`);
+  if (!resp.ok) {
+    return c.json({ error: `upstream error: ${resp.status}` }, 502);
+  }
   const data = ResultSchema.parse(await resp.json());
   return c.json({ result: data.result + n });
 });

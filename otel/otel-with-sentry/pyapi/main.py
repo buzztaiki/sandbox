@@ -27,6 +27,7 @@ async def sum(n: int) -> Result:
 
     async with httpx.AsyncClient() as client:
         resp = await client.get(f"{NEXT_URL}/sum/{n - 1}")
+    resp.raise_for_status()
     data = Result.model_validate(resp.json())
     return Result(result=data.result + n)
 
