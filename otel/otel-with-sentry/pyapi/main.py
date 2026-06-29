@@ -9,7 +9,7 @@ NEXT_URL = os.getenv("NEXT_URL", "http://localhost:8000")
 
 sentry_sdk.init(
     dsn=os.getenv("SENTRY_DSN"),
-    traces_sample_rate=0.0,
+    traces_sample_rate=None,
 )
 app = FastAPI()
 
