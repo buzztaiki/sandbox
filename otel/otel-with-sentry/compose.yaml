@@ -14,9 +14,31 @@ services:
         condition: service_completed_successfully
     environment:
       SENTRY_DSN: ${SENTRY_DSN}
-      NEXT_URL: http://pyapi:8000
+      NEXT_URL: http://expressapi:3001
       NODE_OPTIONS: --require /instrumentations/nodejs/autoinstrumentation.js
       OTEL_SERVICE_NAME: honoapi
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: none
+      OTEL_SEMCONV_STABILITY_OPT_IN: http,database,messaging
+
+  expressapi:
+    build: ./expressapi
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./expressapi/src:/app/src
+      - instrumentations:/instrumentations:ro
+    depends_on:
+      nodejs-instrumentation-init:
+        condition: service_completed_successfully
+    environment:
+      SENTRY_DSN: ${SENTRY_DSN}
+      NEXT_URL: http://pyapi:8000
+      NODE_OPTIONS: --require /instrumentations/nodejs/autoinstrumentation.js
+      OTEL_SERVICE_NAME: expressapi
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
       OTEL_EXPORTER_OTLP_PROTOCOL: grpc
       OTEL_TRACES_EXPORTER: otlp

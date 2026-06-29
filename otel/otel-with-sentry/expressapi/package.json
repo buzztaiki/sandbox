@@ -2,7 +2,7 @@
   "name": "expressapi",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts | pino-pretty",
+    "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js"
   },
