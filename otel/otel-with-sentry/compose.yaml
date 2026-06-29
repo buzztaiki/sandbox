@@ -2,12 +2,12 @@ services:
   # ================
   # apis
   # ================
-  nodeapi:
-    build: ./nodeapi
+  honoapi:
+    build: ./honoapi
     ports:
       - "3000:3000"
     volumes:
-      - ./nodeapi/src:/app/src
+      - ./honoapi/src:/app/src
       - instrumentations:/instrumentations:ro
     depends_on:
       nodejs-instrumentation-init:
@@ -16,7 +16,7 @@ services:
       SENTRY_DSN: ${SENTRY_DSN}
       NEXT_URL: http://pyapi:8000
       NODE_OPTIONS: --require /instrumentations/nodejs/autoinstrumentation.js
-      OTEL_SERVICE_NAME: nodeapi
+      OTEL_SERVICE_NAME: honoapi
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
       OTEL_EXPORTER_OTLP_PROTOCOL: grpc
       OTEL_TRACES_EXPORTER: otlp
@@ -36,7 +36,7 @@ services:
         condition: service_completed_successfully
     environment:
       SENTRY_DSN: ${SENTRY_DSN}
-      NEXT_URL: http://nodeapi:3000
+      NEXT_URL: http://honoapi:3000
       PYTHONPATH: /instrumentations/python/opentelemetry/instrumentation/auto_instrumentation:/instrumentations/python
       OTEL_SERVICE_NAME: pyapi
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
