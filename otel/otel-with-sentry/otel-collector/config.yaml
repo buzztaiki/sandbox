@@ -14,8 +14,9 @@ exporters:
     endpoint: jaeger:4317
     tls:
       insecure: true
-  prometheus:
-    endpoint: 0.0.0.0:8889
+  prometheusremotewrite:
+    endpoint: http://prometheus:9090/api/v1/write
+    protobuf_message: "io.prometheus.write.v2.Request"
 
 service:
   pipelines:
@@ -26,4 +27,4 @@ service:
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [prometheus]
+      exporters: [prometheusremotewrite]

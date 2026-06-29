@@ -51,6 +51,9 @@ services:
   # ================
   otel-collector:
     image: otel/opentelemetry-collector-contrib:latest
+    command:
+      - --config=/etc/otelcol-contrib/config.yaml
+      - --feature-gates=exporter.prometheusremotewritexporter.enableSendingRW2
     volumes:
       - ./otel-collector/config.yaml:/etc/otelcol-contrib/config.yaml
     depends_on:
@@ -63,12 +66,14 @@ services:
 
   prometheus:
     image: prom/prometheus:latest
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --enable-feature=native-histograms
+      - --web.enable-remote-write-receiver
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
-    depends_on:
-      - otel-collector
 
   # ================
   # instrumentation init containers
