@@ -1,0 +1,16 @@
+[project]
+name = "pyapi"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi[standard]>=0.138.1",
+    "httpx>=0.28.1",
+    "sentry-sdk>=2.63.0",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.20",
+]

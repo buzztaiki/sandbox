@@ -1,0 +1,117 @@
+services:
+  # ================
+  # apis
+  # ================
+  honoapi:
+    build: ./honoapi
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./honoapi/src:/app/src
+      - instrumentations:/instrumentations:ro
+    depends_on:
+      nodejs-instrumentation-init:
+        condition: service_completed_successfully
+    environment:
+      SENTRY_DSN: ${SENTRY_DSN}
+      NEXT_URL: http://expressapi:3001
+      NODE_OPTIONS: --require /instrumentations/nodejs/autoinstrumentation.js
+      OTEL_SERVICE_NAME: honoapi
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: none
+      OTEL_SEMCONV_STABILITY_OPT_IN: http,database,messaging
+
+  expressapi:
+    build: ./expressapi
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./expressapi/src:/app/src
+      - instrumentations:/instrumentations:ro
+    depends_on:
+      nodejs-instrumentation-init:
+        condition: service_completed_successfully
+    environment:
+      SENTRY_DSN: ${SENTRY_DSN}
+      NEXT_URL: http://pyapi:8000
+      NODE_OPTIONS: --require /instrumentations/nodejs/autoinstrumentation.js
+      OTEL_SERVICE_NAME: expressapi
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: none
+      OTEL_SEMCONV_STABILITY_OPT_IN: http,database,messaging
+
+  pyapi:
+    build: ./pyapi
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./pyapi/main.py:/app/main.py
+      - instrumentations:/instrumentations:ro
+    depends_on:
+      python-instrumentation-init:
+        condition: service_completed_successfully
+    environment:
+      SENTRY_DSN: ${SENTRY_DSN}
+      NEXT_URL: http://honoapi:3000
+      PYTHONPATH: /instrumentations/python/opentelemetry/instrumentation/auto_instrumentation:/instrumentations/python
+      OTEL_SERVICE_NAME: pyapi
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: none
+      OTEL_SEMCONV_STABILITY_OPT_IN: http,database,messaging
+      OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION: base2_exponential_bucket_histogram
+
+  # ================
+  # o11y stack
+  # ================
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    command:
+      - --config=/etc/otelcol-contrib/config.yaml
+    volumes:
+      - ./otel-collector/config.yaml:/etc/otelcol-contrib/config.yaml
+    depends_on:
+      - jaeger
+      - prometheus
+
+  jaeger:
+    image: jaegertracing/jaeger:latest
+    ports:
+      - "16686:16686"
+
+  prometheus:
+    image: prom/prometheus:latest
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --enable-feature=native-histograms
+      - --web.enable-otlp-receiver
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  # ================
+  # instrumentation init containers
+  # ================
+  python-instrumentation-init:
+    image: otel/autoinstrumentation-python:latest
+    volumes:
+      - instrumentations:/instrumentations
+    command: cp -r /autoinstrumentation/. /instrumentations/python/
+
+  nodejs-instrumentation-init:
+    image: otel/autoinstrumentation-nodejs:latest
+    volumes:
+      - instrumentations:/instrumentations
+    command: cp -r /autoinstrumentation/. /instrumentations/nodejs/
+
+volumes:
+  instrumentations:
