@@ -1,11 +1,10 @@
 # Sentry + OTel 共存の調査メモ
 
-このプロジェクトは Sentry と OTel の相性を調査するために作成。
 以下は `honoapi` (Hono/Node.js) で auto-instrumentation と `@sentry/hono/node` を併用する際に調査した内容。
 
 ## 構成
 
-- OTel: `--require autoinstrumentation.js` (OTel Operator スタイル) で起動前に SDK を初期化、OTLP で Collector → Jaeger へエクスポート
+- OTel: `--require autoinstrumentation.js` (OTel Operator スタイル) で起動前に SDK を初期化、OTLP で Collector → Jaeger へエクスポートする
 - Sentry: `@sentry/hono/node` でエラー追跡のみ (トレースは OTel に任せる)
 
 ## 問題点
@@ -50,16 +49,13 @@ runtime では `@sentry/node` の `init()` にそのまま options を渡して�
 ### 4. `propagateTraceparent` による二重注入リスク
 
 - デフォルト: `false`
-- `true` にすると Sentry が `getTraceData()` 経由でアウトゴーイングリクエストに W3C `traceparent` を注入
+- `true` にすると Sentry が `getTraceData()` 経由でリクエストに W3C `traceparent` を注入する
 - `skipOpenTelemetrySetup` なしの場合は `SentryPropagator` も OTel レベルで inject するため二重になりうる
 - `skipOpenTelemetrySetup: true` + `propagateTraceparent` デフォルト (`false`) なら問題なし
 
 ### 5. Profiling は `tracesSampleRate` が必要
 
-`profileSessionSampleRate` (v10.27.0 以降の continuous profiling) も `profilesSampleRate` (deprecated) も、
-サンプリング基準が `tracesSampleRate` に相対的。
-
-`tracesSampleRate` 未設定 = profiling も動かない。
+`profileSessionSampleRate` (v10.27.0 以降の continuous profiling) も `profilesSampleRate` (deprecated) も、サンプリング基準が `tracesSampleRate` による。`tracesSampleRate` 未設定だと profiling も動かない。
 
 ## 推奨設定 (エラー追跡のみ)
 
@@ -110,7 +106,6 @@ Python auto-instrumentation は `sitecustomize.py` → `_OTelSDKConfigurator._co
 ### 解決策: custom instrumentation image + register.js で aggregationPreference を明示する
 
 `otel/autoinstrumentation-nodejs` をベースに custom image (`otel-autoinstrumentation-nodejs/`) を作成し、`autoinstrumentation.js`, `register.js` を変更する。
-
 `OTLPMetricExporter` に `aggregationPreference` を直接渡すことで、exponential histogram として収集できる。
 
 ```js
