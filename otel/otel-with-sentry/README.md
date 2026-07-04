@@ -7,6 +7,20 @@
 - OTel: `--require autoinstrumentation.js` (OTel Operator スタイル) で起動前に SDK を初期化、OTLP で Collector → Jaeger へエクスポートする
 - Sentry: `@sentry/hono/node` でエラー追跡のみ (トレースは OTel に任せる)
 
+```mermaid
+graph LR
+    apps["honoapi / expressapi / pyapi"]
+    collector[OTel Collector]
+    jaeger[Jaeger]
+    prometheus[Prometheus]
+    sentry[Sentry]
+
+    apps -->|OTLP| collector
+    collector -->|traces| jaeger
+    collector -->|metrics| prometheus
+    apps -->|errors| sentry
+```
+
 ## 問題点
 
 ### 1. `tracesSampleRate: 0.0` は spans を有効にする
