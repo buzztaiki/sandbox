@@ -9,14 +9,14 @@ importers:
   .:
     dependencies:
       '@hono/node-server':
-        specifier: ^2.0.6
-        version: 2.0.6(hono@4.12.27)
+        specifier: ^2.0.10
+        version: 2.0.10(hono@4.12.27)
       '@hono/otel':
         specifier: ^1.1.2
         version: 1.1.2(hono@4.12.27)
       '@sentry/hono':
         specifier: ^10.62.0
-        version: 10.62.0(@hono/node-server@2.0.6(hono@4.12.27))(@sentry/node@10.62.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1)))(hono@4.12.27)
+        version: 10.62.0(@hono/node-server@2.0.10(hono@4.12.27))(@sentry/node@10.62.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1)))(hono@4.12.27)
       '@sentry/node':
         specifier: ^10.62.0
         version: 10.62.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))
@@ -266,8 +266,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@hono/node-server@2.0.6':
-    resolution: {integrity: sha512-7DeRlKG57JDBNZ5Qj2jwVdgwQy4b0tLubRLl3zCf91/rCf9i7p1V5FtW/yWibm1uUHE493ts9ZXH/7g/LQWl+g==}
+  '@hono/node-server@2.0.10':
+    resolution: {integrity: sha512-ZcnNVhKTmyDJeg0UlnZjvM73JBsTAuhrH/J4fjwGOw59PwOW51r4J+p6CsKZWXdKSme4MFqU62CZMOsdDrU4CA==}
     engines: {node: '>=20'}
     peerDependencies:
       hono: ^4
@@ -626,7 +626,7 @@ snapshots:
   '@esbuild/win32-x64@0.28.1':
     optional: true
 
-  '@hono/node-server@2.0.6(hono@4.12.27)':
+  '@hono/node-server@2.0.10(hono@4.12.27)':
     dependencies:
       hono: 4.12.27
 
@@ -677,13 +677,13 @@ snapshots:
 
   '@sentry/core@10.62.0': {}
 
-  '@sentry/hono@10.62.0(@hono/node-server@2.0.6(hono@4.12.27))(@sentry/node@10.62.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1)))(hono@4.12.27)':
+  '@sentry/hono@10.62.0(@hono/node-server@2.0.10(hono@4.12.27))(@sentry/node@10.62.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1)))(hono@4.12.27)':
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@sentry/core': 10.62.0
       hono: 4.12.27
     optionalDependencies:
-      '@hono/node-server': 2.0.6(hono@4.12.27)
+      '@hono/node-server': 2.0.10(hono@4.12.27)
       '@sentry/node': 10.62.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))
 
   '@sentry/node-core@10.62.0(@opentelemetry/api@1.9.1)(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/instrumentation@0.214.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1))':
